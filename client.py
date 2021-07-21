@@ -54,6 +54,24 @@ send_button.pack()
 root.protocol("WM_DELETE_WINDOW", closing)
 
 
+
+#Pegamos o endenreço e criamos um socket para conecta-lo
+HOST = input("Entre com o host:")
+PORT = input("Entre com a porta:")
+
+if not PORT:
+    PORT = 33000 #Valor default
+else:
+    PORT = int (PORT)
+
+BUFSIZ = 1024
+ADDR = (HOST, PORT)
+client_socket = socket(AF_INET, SOCK_STREAM)
+client_socket.connect(ADDR)
+
+#inicio da thread para recebimento das mensagens
+receive_thread = Thread(target=receive)
+receive_thread.start()
 tkinter.mainloop()
 
 
