@@ -1,4 +1,4 @@
-from socket import AF_INET, socket, SOCK_STREAM
+import socket
 from threading import Thread
 import tkinter
 from tkinter.constants import Y
@@ -49,24 +49,26 @@ messages_frame.pack()
 entry = tkinter.Entry(root, textvariable=my_msg)
 entry.bind("<Return>", send)
 entry.pack()
-send_button = tkinter.Button(root, text="Send", command=send)
+send_button = tkinter.Button(root, text="Enviar", command=send)
 send_button.pack()
+
+
 root.protocol("WM_DELETE_WINDOW", closing)
 
-
-
 #Pegamos o endenreço e criamos um socket para conecta-lo
-HOST = input("Entre com o host:")
+#HOST = input("Entre com o host:")
+
+HOST = socket.gethostbyname(socket.gethostname())
 PORT = input("Entre com a porta:")
 
 if not PORT:
-    PORT = 33000 #Valor default
+    PORT = 5000 #Valor default
 else:
     PORT = int (PORT)
 
 BUFSIZ = 1024
 ADDR = (HOST, PORT)
-client_socket = socket(AF_INET, SOCK_STREAM)
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect(ADDR)
 
 #inicio da thread para recebimento das mensagens
