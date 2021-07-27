@@ -29,7 +29,8 @@ def on_closing(event=None):
     send()
 
 root = tkinter.Tk()
-root.title("Chatter")
+root.geometry('600x1000')
+root.title("El Chat")
 
 messages_frame = tkinter.Frame(root)
 my_msg = tkinter.StringVar()  # For the messages to be sent.
