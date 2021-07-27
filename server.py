@@ -1,81 +1,107 @@
-from os import truncate
-from socket import socket, AF_INET, SOCK_STREAM
+"""Server for multithreaded (asynchronous) chat application."""
+from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 
-#aceitando conexões
-#composto por um loop que espera infinitamente por conexões que cheguem
-#e assim que as recebe imprime na tela detalhes da conexão e envia uma mensagem de boas vindas
-#também aramazena o endereço do cliente na biblioteca "adresses" em depois
-#por final iniciando uma thread para esse cliente
+
 def accept_incoming_connections():
+    """Sets up handling for incoming clients."""
     while True:
-        client, client_adresses = SERVER.accept()
-        print("%s:%s conectou-se." % client_adresses)
-        client.send(bytes("Olá estranho!!!"+
-                            "Digite o seu nome e pressione enter",
-        "utf8"))
-        adresses[client] = client_adresses
-        print (adresses[client])
+        client, client_address = SERVER.accept()
+        print("%s:%s has connected." % client_address)
+        client.send(bytes("Greetings from the cave! Now type your name and press enter!", "utf8"))
+        addresses[client] = client_address
+        # print('1')
+        # print(addresses[client])
         Thread(target=handle_client, args=(client,)).start()
 
 
+def handle_client(client):  # Takes client socket as argument.
+    """Handles a single client connection."""
+    # name = client.recv(BUFSIZ).decode("utf8")
+    # print('aaaaaaa')
+    # for nome in clients:
+    #     print('1')
+    #     print(name[clients])
+    #     if(name == nome[clients]):
+    #         while (name == nome[clients]):
+    #             message = 'Cliente existente tente outro nome'
+    #             client.send(bytes(message, "utf8"))
+    #             msg = client.recv(BUFSIZ)
+    #     else:
+    #         welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
+    #         client.send(bytes(welcome, "utf8"))
+    #         msg = "%s has joined the chat!" % name
+    #         broadcast(bytes(msg, "utf8"))
+    #         clients[client] = name
+    
+    # # for cli in clients:
+    # #     print(clients[cli])
+    # print('bbbbb')
+    # while True:
+    #     print('ccccc')
+    #     msg = client.recv(BUFSIZ)
+    #     if msg != bytes("{quit}", "utf8"):
+    #         broadcast(msg, name+": ")
+    #     elif msg == bytes("{lista}", "utf8"):
+    #         list()
+    #     else:
+    #         client.send(bytes("{quit}", "utf8"))
+    #         client.close()
+    #         del clients[client]
+    #         broadcast(bytes("%s has left the chat." % name, "utf8"))
+    #         break
 
-def handle_client(client): #recebe um socket como argumento
     name = client.recv(BUFSIZ).decode("utf8")
-    welcome = "Bem vindo(a) %s!!! Se deseja sair, digite {quit}." %name
+    welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
     client.send(bytes(welcome, "utf8"))
-    msg = "%s entrou no chat" %name
-    broadcast = (bytes(msg, "utf8"))
+    msg = "%s has joined the chat!" % name
+    broadcast(bytes(msg, "utf8"))
     clients[client] = name
     while True:
-        #envio da lista de nomes vai aqui
         msg = client.recv(BUFSIZ)
-        if msg != bytes("{quit}", "utf8"):
+        lista = 'list'
+        lista1 = bytes(lista, 'utf-8')
+        if msg == lista1:
+            print('1234')
+            list()
+        elif msg != bytes("{quit}", "utf8"):
             broadcast(msg, name+": ")
         else:
             client.send(bytes("{quit}", "utf8"))
             client.close()
-            #del clients[client]
-            #broadcast(bytes("%s saiu do chat." %name, "utf8"))
+            del clients[client]
+            broadcast(bytes("%s has left the chat." % name, "utf8"))
             break
+   
 
+def broadcast(msg, prefix=""):  # prefix is for name identification.
+    """Broadcasts a message to all the clients."""
 
-def broadcast(msg, prefix=""): #prefixo é para a identificação do nome
-    #mensagem broadcast para todos os clientes
     for sock in clients:
-        sock.send(bytes(prefix, "utf8")+ msg)
+        sock.send(bytes(prefix, "utf8")+msg)
 
-
+def list(name):
+    
+    for cli, addr in zip(clients, addresses):
+        if(name == )
+        lista = (f'|Nome: {clients[cli]} | IP & Porta: {addresses[addr]} |')
+        broadcast(lista.encode('ascii'))
+        
 clients = {}
-adresses = {}
-IPs = {}
+addresses = {}
+
 HOST = ''
 PORT = 5000
 BUFSIZ = 1024
 ADDR = (HOST, PORT)
+
 SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDR)
 
-
 if __name__ == "__main__":
-    SERVER.listen(5) #aceita no maximo 5 conexões
-    print("Aguardando conexão...")
+    SERVER.listen(5)
+    print("Waiting for connection...")
     ACCEPT_THREAD = Thread(target=accept_incoming_connections)
     ACCEPT_THREAD.start()
     ACCEPT_THREAD.join()
     SERVER.close()
-
-
-
-
-# #pegando o hostname
-
-# hostname = socket.gethostname()
-
-# #pegando o ip
-# ip_address = socket.gethostbyname(hostname)
-
-
-# print(f"Hostname: {hostname}")
-# print(f"IP Address: {ip_address}")
-
