@@ -17,54 +17,41 @@ def accept_incoming_connections():
 
 def handle_client(client):  # Takes client socket as argument.
     """Handles a single client connection."""
-    # name = client.recv(BUFSIZ).decode("utf8")
-    # print('aaaaaaa')
-    # for nome in clients:
-    #     print('1')
-    #     print(name[clients])
-    #     if(name == nome[clients]):
-    #         while (name == nome[clients]):
-    #             message = 'Cliente existente tente outro nome'
-    #             client.send(bytes(message, "utf8"))
-    #             msg = client.recv(BUFSIZ)
-    #     else:
-    #         welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
-    #         client.send(bytes(welcome, "utf8"))
-    #         msg = "%s has joined the chat!" % name
-    #         broadcast(bytes(msg, "utf8"))
-    #         clients[client] = name
+    list()
     
-    # # for cli in clients:
-    # #     print(clients[cli])
-    # print('bbbbb')
-    # while True:
-    #     print('ccccc')
-    #     msg = client.recv(BUFSIZ)
-    #     if msg != bytes("{quit}", "utf8"):
-    #         broadcast(msg, name+": ")
-    #     elif msg == bytes("{lista}", "utf8"):
-    #         list()
-    #     else:
-    #         client.send(bytes("{quit}", "utf8"))
-    #         client.close()
-    #         del clients[client]
-    #         broadcast(bytes("%s has left the chat." % name, "utf8"))
-    #         break
-
     name = client.recv(BUFSIZ).decode("utf8")
+    
     welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
     client.send(bytes(welcome, "utf8"))
     msg = "%s has joined the chat!" % name
+    
     broadcast(bytes(msg, "utf8"))
     clients[client] = name
+    
     while True:
         msg = client.recv(BUFSIZ)
+
+        out = '{quit}'
+        quit = bytes(out, 'utf-8')
+
         lista = 'list'
         lista1 = bytes(lista, 'utf-8')
-        if msg == lista1:
+        
+        search = transf(msg)
+        if search == True:
+            tamMsg = len(msg)
+            
+            slice_obj = slice(9, tamMsg)
+            Name = msg[slice_obj]
+            print(type(Name))
+            nome_transf = str(Name, 'utf-8')
+            print(type(nome_transf))
+            print(nome_transf)
+            listUsr(nome_transf)
+        elif msg == lista1:
             print('1234')
             list()
-        elif msg != bytes("{quit}", "utf8"):
+        elif msg != quit:
             broadcast(msg, name+": ")
         else:
             client.send(bytes("{quit}", "utf8"))
@@ -80,13 +67,24 @@ def broadcast(msg, prefix=""):  # prefix is for name identification.
     for sock in clients:
         sock.send(bytes(prefix, "utf8")+msg)
 
-def list(name):
+def list():
     
     for cli, addr in zip(clients, addresses):
-        if(name == )
         lista = (f'|Nome: {clients[cli]} | IP & Porta: {addresses[addr]} |')
         broadcast(lista.encode('ascii'))
         
+def listUsr(name):
+    
+    for cli, addr in zip(clients, addresses):
+        if name == clients[cli]:
+            msg = (f'| IP & Porta de {name} : {addresses[addr]} |')
+            broadcast(msg.encode('ascii'))
+
+def transf(var):
+    seq = var.decode()
+    comp = seq.startswith("Pesquisa")
+    return comp 
+    
 clients = {}
 addresses = {}
 
