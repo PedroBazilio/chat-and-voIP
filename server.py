@@ -19,13 +19,15 @@ def handle_client(client):  # Takes client socket as argument.
     """Handles a single client connection."""
     
     name = client.recv(BUFSIZ).decode("utf8")
+    vrf = vrfName(name,client)
+    while vrf != True:
+        vrfName(name, client)
     
-    welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
-    client.send(bytes(welcome, "utf8"))
-    msg = "%s has joined the chat!" % name
-    
-    broadcast(bytes(msg, "utf8"))
-    clients[client] = name
+    # welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
+    # client.send(bytes(welcome, "utf8"))
+    # msg = "%s has joined the chat!" % name
+    # broadcast(bytes(msg, "utf8"))
+    # clients[client] = name
     
     while True:
         msg = client.recv(BUFSIZ)
@@ -36,14 +38,14 @@ def handle_client(client):  # Takes client socket as argument.
         lista = 'list'
         lista1 = bytes(lista, 'utf-8')
         
-        search = transf(msg)
+        search = decodeVar(msg)
         if search == True:
 
             tamMsg = len(msg)
             slice_obj = slice(9, tamMsg)
             Name = msg[slice_obj]
-            nome_transf = str(Name, 'utf-8')
-            listUsr(nome_transf)
+            nome_decodeVar = str(Name, 'utf-8')
+            listUsr(nome_decodeVar)
         else:
 
             if msg == lista1:
@@ -84,21 +86,32 @@ def listUsr(name):
     for cli, addr in zip(clients, addresses):
         if name == clients[cli]:
             msg = (f'| IP & Porta de {name} : {addresses[addr]} |')
-            #broadcast(msg.encode('ascii'))
-            cli.send(bytes(msg, 'utf8'))
+            broadcast(msg.encode('ascii'))
+            #cli.send(bytes(msg, 'utf8'))
         
     broadcast(bytes("Usuario não encontrado.", "utf8"))
     
 
 
-def transf(var):
+def decodeVar(var):
     seq = var.decode()
     comp = seq.startswith("Pesquisa")
     return comp 
     
 
-
-
+def vrfName(varNome, client):
+    for nome in clients:
+        if varNome == clients[nome]:
+            broadcast(bytes("Usuario inexistente.", "utf8"))
+            name = client.recv(BUFSIZ).decode("utf8")
+            return False
+            
+    welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % varNome
+    client.send(bytes(welcome, "utf8"))
+    msg = "%s has joined the chat!" % varNome 
+    broadcast(bytes(msg, "utf8"))
+    clients[client] = varNome
+    return True
 
 clients = {}
 addresses = {}
