@@ -75,9 +75,9 @@ def broadcast(msg, prefix=""):  # prefix is for name identification.
 def list():
     
     for cli, addr in zip(clients, addresses):
-        lista = (f'|Nome: {clients[cli]} | IP & Porta: {addresses[addr]} |')
-        print(lista.encode('ascii'))
-        #broadcast(lista.encode('ascii'))
+        lista = (f'|Nome: {clients[cli]} | IP & Porta: {addresses[addr]} |\n')
+        #print(lista.encode('ascii'))
+        broadcast(lista.encode('ascii'))
 
 
 
@@ -95,8 +95,8 @@ def listUsr(name):
 
 def decodeVar(var):
     seq = var.decode()
-    comp = seq.startswith("Pesquisa")
-    return comp 
+    #comp = seq.startswith("Pesquisa")
+    return seq.startswith("Pesquisa")
     
 
 def vrfName(varNome, client):
