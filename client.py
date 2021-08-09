@@ -5,38 +5,38 @@ import tkinter
 
 
 def receive():
-    """Handles receiving of messages."""
+    """Para o recebimento de mensagens."""
     while True:
         try:
             msg = client_socket.recv(BUFSIZ).decode("utf8")
             msg_list.insert(tkinter.END, msg)
-        except OSError:  # Possibly client has left the chat.
+        except OSError:  # Perda de conexão com o cliente.
             break
 
 
-def send(event=None):  # event is passed by binders.
-    """Handles sending of messages."""
+def send(event=None):  # evento é passado por 'binders'.
+    """Lida com o envio de mensagens."""
     msg = my_msg.get()
-    my_msg.set("")  # Clears input field.
+    my_msg.set("")  # Limpa o campo input.
     client_socket.send(bytes(msg, "utf8"))
-    if msg == "{quit}":
+    if msg == "{sair}":
         client_socket.close()
         root.quit()
 
-def on_closing(event=None):
+def close(event=None):
     
-    my_msg.set("{quit}")
+    my_msg.set("{sair}")
     send()
 
 root = tkinter.Tk()
 #root.geometry('600x1000')
-root.title("El Chat")
+root.title("The Grand Chat")
 
 messages_frame = tkinter.Frame(root)
-my_msg = tkinter.StringVar()  # For the messages to be sent.
-my_msg.set("Type your messages here.")
-scrollbar = tkinter.Scrollbar(messages_frame)  # To navigate through past messages.
-# Following will contain the messages.
+my_msg = tkinter.StringVar()  # Para as mensagens a serem enviadas.
+my_msg.set("Digite suas mensagens aqui.")
+scrollbar = tkinter.Scrollbar(messages_frame)  # Para navegar por mensagens antigas.
+# Compartimento das mensagens abaixo.
 msg_list = tkinter.Listbox(messages_frame, height=25, width=70, yscrollcommand=scrollbar.set)
 scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 msg_list.pack(side=tkinter.LEFT, fill=tkinter.BOTH)
@@ -49,9 +49,9 @@ entry_field.pack()
 send_button = tkinter.Button(root, text="Send", command=send)
 send_button.pack()
 
-root.protocol("WM_DELETE_WINDOW", on_closing)
+root.protocol("WM_DELETE_WINDOW", close)
 
-#----Now comes the sockets part----
+#----Parte relacionada aos sockets----
 HOST = input("Host: ")
 PORT = 5000
 
