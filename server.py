@@ -1,4 +1,4 @@
-"""Server for multithreaded (asynchronous) chat application."""
+"""Server para aplicação de chat assíncrona."""
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 
@@ -8,15 +8,15 @@ def accept_incoming_connections():
     """Sets up handling for incoming clients."""
     while True:
         client, client_address = SERVER.accept()
-        print("%s:%s has connected." % client_address)
-        client.send(bytes("Greetings from the cave! Now type your name and press enter!", "utf8"))
+        print("%s:%s se conectou." % client_address)
+        client.send(bytes("Bem vindo ao nosso local! Digite seu nome e pressione enter!", "utf8"))
         addresses[client] = client_address
         Thread(target=handle_client, args=(client,)).start()
         list()
 
 
-def handle_client(client):  # Takes client socket as argument.
-    """Handles a single client connection."""
+def handle_client(client):  # Leva socket do cliente como argumento.
+    """Lida com uma conexão singular do cliente."""
     
     name = client.recv(BUFSIZ).decode("utf8")
     vrf = vrfName(name,client)
@@ -32,7 +32,7 @@ def handle_client(client):  # Takes client socket as argument.
     while True:
         msg = client.recv(BUFSIZ)
 
-        out = '{quit}'
+        out = '{sair}'
         quit = bytes(out, 'utf-8')
 
         lista = 'list'
@@ -55,7 +55,7 @@ def handle_client(client):  # Takes client socket as argument.
                 broadcast(msg, name+": ")
             
             else:
-                client.send(bytes("{quit}", "utf8"))
+                client.send(bytes("{sair}", "utf8"))
                 client.close()
                 del clients[client]
                 broadcast(bytes("%s has left the chat." % name, "utf8"))
@@ -64,8 +64,8 @@ def handle_client(client):  # Takes client socket as argument.
 
 
 
-def broadcast(msg, prefix=""):  # prefix is for name identification.
-    """Broadcasts a message to all the clients."""
+def broadcast(msg, prefix=""):  # prefixo é para identificação do nome.
+    """Envia uma mensagem em broadcast para todos os clientes."""
 
     for sock in clients:
         sock.send(bytes(prefix, "utf8")+msg)
@@ -106,7 +106,7 @@ def vrfName(varNome, client):
             name = client.recv(BUFSIZ).decode("utf8")
             return False
             
-    welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % varNome
+    welcome = 'Bem-Vindo %s! Se desejar sair, digite {sair}.' % varNome
     client.send(bytes(welcome, "utf8"))
     msg = "%s has joined the chat!" % varNome 
     broadcast(bytes(msg, "utf8"))
@@ -127,7 +127,7 @@ SERVER.bind(ADDR)
 
 if __name__ == "__main__":
     SERVER.listen(5)
-    print("Waiting for connection...")
+    print("Aguardando Conexão...")
     ACCEPT_THREAD = Thread(target=accept_incoming_connections)
     ACCEPT_THREAD.start()
     ACCEPT_THREAD.join()
