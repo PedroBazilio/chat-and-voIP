@@ -19,9 +19,11 @@ def handle_client(client):  # Leva socket do cliente como argumento.
     """Lida com uma conexão singular do cliente."""
     
     name = client.recv(BUFSIZ).decode("utf8")
+    print("O nome do usuário é ", name)
     vrf = vrfName(name,client)
     while vrf != True:
-        vrfName(name, client)
+        client.send(bytes("Digite outro nome: ", "utf8"))
+        vrf = vrfName(name,client)
     
     # welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
     # client.send(bytes(welcome, "utf8"))
@@ -102,7 +104,8 @@ def decodeVar(var):
 def vrfName(varNome, client):
     for nome in clients:
         if varNome == clients[nome]:
-            broadcast(bytes("Usuario inexistente.", "utf8"))
+            client.send(bytes("Usuário já existe", "utf8"))
+            # broadcast(bytes("Usuario já existe.", "utf8"))
             name = client.recv(BUFSIZ).decode("utf8")
             return False
             
