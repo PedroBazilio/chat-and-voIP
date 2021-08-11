@@ -7,7 +7,7 @@ Aplicação para a Disciplina de Redes II, cujo objetivo é implementar serviço
 </p>
 
 Para iniciar a aplicação deve-se primeiramente abrir dois terminais de comando.
-
+![foto1](https://user-images.githubusercontent.com/33727038/128957210-021799ae-d825-4cde-b712-18de1dd713d7.jpeg)
 Primeiramente deve-se iniciar o programa 'server.py'. Ela servirá como o servidor central da nossa aplicação.
 
 Após feito isso, para iniciar aplicação de mensagens e verificação deve ser iniciado o programa "client.py"
