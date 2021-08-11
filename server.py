@@ -4,7 +4,7 @@ from threading import Thread
 
 
 
-def accept_incoming_connections():
+def conectar_ao_usuario():
     """Sets up handling for incoming clients."""
     while True:
         client, client_address = SERVER.accept()
@@ -23,14 +23,9 @@ def handle_client(client):  # Leva socket do cliente como argumento.
     vrf = vrfName(name,client)
     while vrf != True:
         client.send(bytes("Digite outro nome: ", "utf8"))
+        name = client.recv(BUFSIZ).decode("utf8")
         vrf = vrfName(name,client)
-    
-    # welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
-    # client.send(bytes(welcome, "utf8"))
-    # msg = "%s has joined the chat!" % name
-    # broadcast(bytes(msg, "utf8"))
-    # clients[client] = name
-    
+    vrf = False
     while True:
         msg = client.recv(BUFSIZ)
 
@@ -102,11 +97,12 @@ def decodeVar(var):
     
 
 def vrfName(varNome, client):
+    print(varNome)
     for nome in clients:
         if varNome == clients[nome]:
             client.send(bytes("Usuário já existe", "utf8"))
             # broadcast(bytes("Usuario já existe.", "utf8"))
-            name = client.recv(BUFSIZ).decode("utf8")
+            # name = client.recv(BUFSIZ).decode("utf8")
             return False
             
     welcome = 'Bem-Vindo %s! Se desejar sair, digite {sair}.' % varNome
@@ -131,7 +127,7 @@ SERVER.bind(ADDR)
 if __name__ == "__main__":
     SERVER.listen(5)
     print("Aguardando Conexão...")
-    ACCEPT_THREAD = Thread(target=accept_incoming_connections)
+    ACCEPT_THREAD = Thread(target=conectar_ao_usuario)
     ACCEPT_THREAD.start()
     ACCEPT_THREAD.join()
     SERVER.close()
