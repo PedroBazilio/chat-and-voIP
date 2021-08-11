@@ -5,7 +5,7 @@ from threading import Thread
 def conectar_ao_usuario():
     while True:
         client, client_address = SERVER.accept()
-        print("%s:%s se conectou." % client_address)
+        print("%s|%s entrou no servidor." % client_address)
         client.send(bytes("Bem vindo ao nosso local! Digite seu nome e pressione enter!", "utf8"))
         addresses[client] = client_address
         Thread(target=tratamento_nome_e_mensagem, args=(client,)).start()
@@ -15,7 +15,6 @@ def conectar_ao_usuario():
 def tratamento_nome_e_mensagem(client):  # Leva socket do cliente como argumento.
     
     name = client.recv(TAM_BUFFER).decode("utf8")
-    print("O nome do usuário é ", name)
     vrf = vrfName(name,client)
     while vrf != True:
         client.send(bytes("Digite outro nome: ", "utf8"))
@@ -52,7 +51,7 @@ def tratamento_nome_e_mensagem(client):  # Leva socket do cliente como argumento
                 client.close()
                 del clients[client]
                 for sock in clients:
-                    sock.send(bytes(name+" Saiu." , "utf8")+mensagem)
+                    sock.send(bytes(name+" Saiu." , "utf8"))
                 break   
 
 def list(client):
@@ -84,12 +83,11 @@ def decodeVar(var):
     
 
 def vrfName(varNome, client):
-    print(varNome)
     for nome in clients:
         if varNome == clients[nome]:
             client.send(bytes("Usuário já existe", "utf8"))
             return False
-            
+    print("O nome do usuário é ", varNome)      
     client.send(bytes(('Bem-Vindo %s! Se desejar sair, digite {sair}.' % varNome), "utf8"))
     # msg = " has joined the chat!" % varNome 
     for sock in clients:
