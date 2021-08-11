@@ -21,18 +21,18 @@ def send(event=None):  # evento é passado por 'binders'.
     client_socket.send(bytes(msg, "utf8"))
     if msg == "{sair}":
         client_socket.close()
-        root.quit()
+        tk.quit()
 
 def close(event=None):
     
     my_msg.set("{sair}")
     send()
 
-root = tkinter.Tk()
-#root.geometry('600x1000')
-root.title("The Grand Chat")
+tk = tkinter.Tk()
+#tk.geometry('600x1000')
+tk.title("Chat")
 
-messages_frame = tkinter.Frame(root)
+messages_frame = tkinter.Frame(tk)
 my_msg = tkinter.StringVar()  # Para as mensagens a serem enviadas.
 my_msg.set("Digite suas mensagens aqui.")
 scrollbar = tkinter.Scrollbar(messages_frame)  # Para navegar por mensagens antigas.
@@ -43,13 +43,13 @@ msg_list.pack(side=tkinter.LEFT, fill=tkinter.BOTH)
 msg_list.pack()
 messages_frame.pack()
 
-entry_field = tkinter.Entry(root, textvariable=my_msg)
+entry_field = tkinter.Entry(tk, textvariable=my_msg)
 entry_field.bind("<Return>", send)
 entry_field.pack()
-send_button = tkinter.Button(root, text="Send", command=send)
+send_button = tkinter.Button(tk, text="Send", command=send)
 send_button.pack()
 
-root.protocol("WM_DELETE_WINDOW", close)
+tk.protocol("WM_DELETE_WINDOW", close)
 
 #----Parte relacionada aos sockets----
 HOST = input("Host: ")
