@@ -44,23 +44,18 @@ def tratamento_nome_e_mensagem(client):  # Leva socket do cliente como argumento
                 list(client)
 
             elif mensagem != quit:
-                broadcast(mensagem, name+": ")
+                for sock in clients:
+                    sock.send(bytes(name+": ", "utf8")+mensagem)
             
             else:
                 client.send(bytes("{sair}", "utf8"))
                 client.close()
                 del clients[client]
-                broadcast(bytes("%s has left the chat." % name, "utf8"))
+                for sock in clients:
+                    sock.send(bytes(name+" has left the chat." , "utf8")+mensagem)
                 break
    
 
-
-
-def broadcast(msg, prefix=""):  # prefixo é para identificação do nome.
-    """Envia uma mensagem em broadcast para todos os clientes."""
-
-    for sock in clients:
-        sock.send(bytes(prefix, "utf8")+msg)
 
 
 
