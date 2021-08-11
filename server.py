@@ -12,7 +12,7 @@ def accept_incoming_connections():
         client.send(bytes("Bem vindo ao nosso local! Digite seu nome e pressione enter!", "utf8"))
         addresses[client] = client_address
         Thread(target=handle_client, args=(client,)).start()
-        list()
+        list(client)
 
 
 def handle_client(client):  # Leva socket do cliente como argumento.
@@ -22,7 +22,6 @@ def handle_client(client):  # Leva socket do cliente como argumento.
     vrf = vrfName(name,client)
     while vrf != True:
         vrfName(name, client)
-    
     # welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
     # client.send(bytes(welcome, "utf8"))
     # msg = "%s has joined the chat!" % name
@@ -45,11 +44,11 @@ def handle_client(client):  # Leva socket do cliente como argumento.
             slice_obj = slice(9, tamMsg)
             Name = msg[slice_obj]
             nome_decodeVar = str(Name, 'utf-8')
-            listUsr(nome_decodeVar)
+            listUsr(nome_decodeVar, client)
         else:
 
             if msg == lista1:
-                list()
+                list(client)
 
             elif msg != quit:
                 broadcast(msg, name+": ")
@@ -72,24 +71,24 @@ def broadcast(msg, prefix=""):  # prefixo é para identificação do nome.
 
 
 
-def list():
+def list(client):
     
     for cli, addr in zip(clients, addresses):
         lista = (f'|Nome: {clients[cli]} | IP & Porta: {addresses[addr]} |\n')
         #print(lista.encode('ascii'))
-        broadcast(lista.encode('ascii'))
+        client.send(lista.encode('ascii'))
 
 
 
-def listUsr(name):
+def listUsr(name, client):
     
     for cli, addr in zip(clients, addresses):
         if name == clients[cli]:
             msg = (f'| IP & Porta de {name} : {addresses[addr]} |')
-            broadcast(msg.encode('ascii'))
-            #cli.send(bytes(msg, 'utf8'))
+            client.send(msg.encode('ascii'))
+            
         
-    broadcast(bytes("Usuario não encontrado.", "utf8"))
+    client.send(bytes("Usuario não encontrado.", "utf8"))
     
 
 
@@ -105,7 +104,8 @@ def vrfName(varNome, client):
             broadcast(bytes("Usuario inexistente.", "utf8"))
             name = client.recv(BUFSIZ).decode("utf8")
             return False
-            
+    
+    print('O usuário se chama: ', varNome)
     welcome = 'Bem-Vindo %s! Se desejar sair, digite {sair}.' % varNome
     client.send(bytes(welcome, "utf8"))
     msg = "%s has joined the chat!" % varNome 
