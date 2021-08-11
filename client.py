@@ -8,7 +8,7 @@ def receive():
     """Para o recebimento de mensagens."""
     while True:
         try:
-            msg = client_socket.recv(BUFSIZ).decode("utf8")
+            msg = client_socket.recv(TAM_BUFFER).decode("utf8")
             msg_list.insert(tkinter.END, msg)
         except OSError:  # Perda de conexão com o cliente.
             break
@@ -21,18 +21,18 @@ def send(event=None):  # evento é passado por 'binders'.
     client_socket.send(bytes(msg, "utf8"))
     if msg == "{sair}":
         client_socket.close()
-        root.quit()
+        tk.quit()
 
 def close(event=None):
     
     my_msg.set("{sair}")
     send()
 
-root = tkinter.Tk()
-#root.geometry('600x1000')
-root.title("The Grand Chat")
+tk = tkinter.Tk()
+#tk.geometry('600x1000')
+tk.title("Chat")
 
-messages_frame = tkinter.Frame(root)
+messages_frame = tkinter.Frame(tk)
 my_msg = tkinter.StringVar()  # Para as mensagens a serem enviadas.
 my_msg.set("Digite suas mensagens aqui.")
 scrollbar = tkinter.Scrollbar(messages_frame)  # Para navegar por mensagens antigas.
@@ -43,19 +43,19 @@ msg_list.pack(side=tkinter.LEFT, fill=tkinter.BOTH)
 msg_list.pack()
 messages_frame.pack()
 
-entry_field = tkinter.Entry(root, textvariable=my_msg)
+entry_field = tkinter.Entry(tk, textvariable=my_msg)
 entry_field.bind("<Return>", send)
 entry_field.pack()
-send_button = tkinter.Button(root, text="Send", command=send)
+send_button = tkinter.Button(tk, text="Enviar", command=send)
 send_button.pack()
 
-root.protocol("WM_DELETE_WINDOW", close)
+tk.protocol("WM_DELETE_WINDOW", close)
 
 #----Parte relacionada aos sockets----
+TAM_BUFFER = 1024
 HOST = input("Host: ")
 PORT = 5000
 
-BUFSIZ = 1024
 ADDR = (HOST, PORT)
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
