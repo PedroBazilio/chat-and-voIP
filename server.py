@@ -14,16 +14,16 @@ def conectar_ao_usuario():
 
 def tratamento_nome_e_mensagem(client):  # Leva socket do cliente como argumento.
     
-    name = client.recv(BUFSIZ).decode("utf8")
+    name = client.recv(TAM_BUFFER).decode("utf8")
     print("O nome do usuário é ", name)
     vrf = vrfName(name,client)
     while vrf != True:
         client.send(bytes("Digite outro nome: ", "utf8"))
-        name = client.recv(BUFSIZ).decode("utf8")
+        name = client.recv(TAM_BUFFER).decode("utf8")
         vrf = vrfName(name,client)
     vrf = False
     while True:
-        mensagem = client.recv(BUFSIZ)
+        mensagem = client.recv(TAM_BUFFER)
         out = '{sair}'
         quit = bytes(out, 'utf-8')
 
@@ -52,12 +52,8 @@ def tratamento_nome_e_mensagem(client):  # Leva socket do cliente como argumento
                 client.close()
                 del clients[client]
                 for sock in clients:
-                    sock.send(bytes(name+" has left the chat." , "utf8")+mensagem)
-                break
-   
-
-
-
+                    sock.send(bytes(name+" Saiu." , "utf8")+mensagem)
+                break   
 
 def list(client):
     
@@ -95,8 +91,10 @@ def vrfName(varNome, client):
             return False
             
     client.send(bytes(('Bem-Vindo %s! Se desejar sair, digite {sair}.' % varNome), "utf8"))
-    msg = "%s has joined the chat!" % varNome 
-    broadcast(bytes(msg, "utf8"))
+    # msg = " has joined the chat!" % varNome 
+    for sock in clients:
+        sock.send(bytes(varNome+" Entrou!" , "utf8"))
+    # broadcast(bytes(msg, "utf8"))
     clients[client] = varNome
     return True
 
@@ -104,18 +102,18 @@ clients = {}
 addresses = {}
 
 
+TAM_BUFFER = 1024
 HOST = ''
 PORT = 5000
-BUFSIZ = 1024
 ADDR = (HOST, PORT)
 
 SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDR)
 
-if __name__ == "__main__":
-    SERVER.listen(5)
-    print("Aguardando Conexão...")
-    ACCEPT_THREAD = Thread(target=conectar_ao_usuario)
-    ACCEPT_THREAD.start()
-    ACCEPT_THREAD.join()
-    SERVER.close()
+
+SERVER.listen(5)
+print("Aguardando Conexão...")
+ACCEPT_THREAD = Thread(target=conectar_ao_usuario)
+ACCEPT_THREAD.start()
+ACCEPT_THREAD.join()
+SERVER.close()

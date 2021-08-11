@@ -8,7 +8,7 @@ def receive():
     """Para o recebimento de mensagens."""
     while True:
         try:
-            msg = client_socket.recv(BUFSIZ).decode("utf8")
+            msg = client_socket.recv(TAM_BUFFER).decode("utf8")
             msg_list.insert(tkinter.END, msg)
         except OSError:  # Perda de conexão com o cliente.
             break
@@ -46,16 +46,16 @@ messages_frame.pack()
 entry_field = tkinter.Entry(tk, textvariable=my_msg)
 entry_field.bind("<Return>", send)
 entry_field.pack()
-send_button = tkinter.Button(tk, text="Send", command=send)
+send_button = tkinter.Button(tk, text="Enviar", command=send)
 send_button.pack()
 
 tk.protocol("WM_DELETE_WINDOW", close)
 
 #----Parte relacionada aos sockets----
+TAM_BUFFER = 1024
 HOST = input("Host: ")
 PORT = 5000
 
-BUFSIZ = 1024
 ADDR = (HOST, PORT)
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
