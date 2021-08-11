@@ -9,7 +9,7 @@ def conectar_ao_usuario():
         client.send(bytes("Bem vindo ao nosso local! Digite seu nome e pressione enter!", "utf8"))
         addresses[client] = client_address
         Thread(target=tratamento_nome_e_mensagem, args=(client,)).start()
-        list()
+        list(client)
 
 
 def tratamento_nome_e_mensagem(client):  # Leva socket do cliente como argumento.
@@ -37,11 +37,11 @@ def tratamento_nome_e_mensagem(client):  # Leva socket do cliente como argumento
             slice_obj = slice(9, tamMsg)
             Name = mensagem[slice_obj]
             nome_decodeVar = str(Name, 'utf-8')
-            listUsr(nome_decodeVar)
+            listUsr(nome_decodeVar, client)
         else:
 
             if mensagem == lista1:
-                list()
+                list(client)
 
             elif mensagem != quit:
                 broadcast(mensagem, name+": ")
@@ -64,24 +64,25 @@ def broadcast(msg, prefix=""):  # prefixo é para identificação do nome.
 
 
 
-def list():
+def list(client):
     
     for cli, addr in zip(clients, addresses):
         lista = (f'|Nome: {clients[cli]} | IP & Porta: {addresses[addr]} |\n')
         #print(lista.encode('ascii'))
-        broadcast(lista.encode('ascii'))
+        client.send(lista.encode('ascii'))
 
 
 
-def listUsr(name):
+def listUsr(name, client):
     
     for cli, addr in zip(clients, addresses):
         if name == clients[cli]:
             msg = (f'| IP & Porta de {name} : {addresses[addr]} |')
-            broadcast(msg.encode('ascii'))
-            #cli.send(bytes(msg, 'utf8'))
+            client.send(msg.encode('ascii'))
+            return
+            
         
-    broadcast(bytes("Usuario não encontrado.", "utf8"))
+    client.send(bytes("Usuario não encontrado.", "utf8"))
     
 
 
