@@ -10,30 +10,25 @@ Para iniciar a aplicação deve-se primeiramente abrir dois terminais de comando
 
 Primeiramente deve-se iniciar o programa 'server.py'. Ela servirá como o servidor central da nossa aplicação.
 
+![Screenshot_1](https://user-images.githubusercontent.com/57987899/129283121-165b7947-bc1f-4215-b5da-b058b80339e7.png)
 
 Após feito isso, para iniciar aplicação de mensagens e verificação deve ser iniciado o programa "client.py"
 
-
-![foto1](https://user-images.githubusercontent.com/33727038/128957210-021799ae-d825-4cde-b712-18de1dd713d7.jpeg)
-
-
-
-Com ele aberto, primeiramente o programa pede o host(IP) do usuario. Caso não saiba é só digitar "localhost", após, terminal do servidor mostra IP e porta do host conectado.
-
-
-![foto2](https://user-images.githubusercontent.com/33727038/128957367-95445de5-0097-458a-a154-d174706c4e8e.jpeg)
-
-
+![Screenshot_2](https://user-images.githubusercontent.com/57987899/129283316-ae718968-f990-4171-a491-1cfa1f3e5b38.png)
 
 
 Feito isso, basta digitar o nome desejado na interface gráfica e começar a mandar mensagens.
 
 
-![foto3](https://user-images.githubusercontent.com/33727038/128957390-e3aedfc5-5903-4a55-b1a2-459a43d33a5f.jpeg)
+![Screenshot_3](https://user-images.githubusercontent.com/57987899/129283352-36752f63-4b6a-4f74-8b53-9b5fbd6f071c.png)
 
 
 Caso deseje listar os usuários no server, basta digitar "list".
 
+![Screenshot_4](https://user-images.githubusercontent.com/57987899/129283410-b6982798-7fc8-4074-9277-0a82e84f7181.png)
+
 E caso deseje saber se certo usuário está no server basta digitar "Pesquisa NomeDoUsuario".
 
-E finalmente para sair basta digitar "sair".
+![Screenshot_5](https://user-images.githubusercontent.com/57987899/129283458-40de4e06-75a1-47d9-9679-57e11957d796.png)
+
+E finalmente para sair basta digitar "{sair}".
