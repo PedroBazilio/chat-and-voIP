@@ -1,28 +1,19 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 
+enderecos = {}
+lista_usuarios = {}
 
-def conectar_ao_usuario():
-    while True:
-        client, client_address = SERVER.accept()
-        print("%s|%s entrou no servidor." % client_address)
-        client.send(bytes("Bem vindo ao nosso local! Digite seu nome e pressione enter!", "utf8"))
-        addresses[client] = client_address
-        Thread(target=tratamento_nome_e_mensagem, args=(client,)).start()
-        list(client)
-
-
-def tratamento_nome_e_mensagem(client):  # Leva socket do cliente como argumento.
-    
-    name = client.recv(TAM_BUFFER).decode("utf8")
-    vrf = vrfName(name,client)
+def tratamento_nome_e_mensagem(cliente):  # Leva socket do clientee como argumento.    
+    name = cliente.recv(TAM_BUFFER).decode("utf8")
+    vrf = vrfName(name,cliente)
     while vrf != True:
-        client.send(bytes("Digite outro nome: ", "utf8"))
-        name = client.recv(TAM_BUFFER).decode("utf8")
-        vrf = vrfName(name,client)
+        cliente.send(bytes("Digite outro nome: ", "utf8"))
+        name = cliente.recv(TAM_BUFFER).decode("utf8")
+        vrf = vrfName(name,cliente)
     vrf = False
     while True:
-        mensagem = client.recv(TAM_BUFFER)
+        mensagem = cliente.recv(TAM_BUFFER)
         out = '{sair}'
         quit = bytes(out, 'utf-8')
 
@@ -36,82 +27,81 @@ def tratamento_nome_e_mensagem(client):  # Leva socket do cliente como argumento
             slice_obj = slice(9, tamMsg)
             Name = mensagem[slice_obj]
             nome_decodeVar = str(Name, 'utf-8')
-            listUsr(nome_decodeVar, client)
+            listUsr(nome_decodeVar, cliente)
         else:
 
             if mensagem == lista1:
-                list(client)
+                list(cliente)
 
             elif mensagem != quit:
-                for sock in clients:
+                for sock in lista_usuarios:
                     sock.send(bytes(name+": ", "utf8")+mensagem)
             
             else:
-                client.send(bytes("{sair}", "utf8"))
-                client.close()
-                del clients[client]
-                for sock in clients:
+                cliente.send(bytes("{sair}", "utf8"))
+                cliente.close()
+                del lista_usuarios[cliente]
+                for sock in lista_usuarios:
                     sock.send(bytes(name+" Saiu." , "utf8"))
                 break   
 
-def list(client):
-    
-    for cli, addr in zip(clients, addresses):
-        lista = (f'|Nome: {clients[cli]} | IP & Porta: {addresses[addr]} |\n')
+def list(cliente):   
+    for cli, addr in zip(lista_usuarios, enderecos):
+        lista = (f'|Nome: {lista_usuarios[cli]} | IP & Porta: {enderecos[addr]} |\n')
         #print(lista.encode('ascii'))
-        client.send(lista.encode('ascii'))
+        cliente.send(lista.encode('ascii'))
 
 
 
-def listUsr(name, client):
-    
-    for cli, addr in zip(clients, addresses):
-        if name == clients[cli]:
-            msg = (f'| IP & Porta de {name} : {addresses[addr]} |')
-            client.send(msg.encode('ascii'))
+def listUsr(name, cliente):
+    for cli, addr in zip(lista_usuarios, enderecos):
+        if name == lista_usuarios[cli]:
+            msg = (f'| IP & Porta de {name} : {enderecos[addr]} |')
+            cliente.send(msg.encode('ascii'))
             return
             
         
-    client.send(bytes("Usuario não encontrado.", "utf8"))
+    cliente.send(bytes("Usuario não encontrado.", "utf8"))
     
-
 
 def decodeVar(var):
     seq = var.decode()
-    #comp = seq.startswith("Pesquisa")
     return seq.startswith("Pesquisa")
-    
 
-def vrfName(varNome, client):
-    for nome in clients:
-        if varNome == clients[nome]:
-            client.send(bytes("Usuário já existe", "utf8"))
+
+def vrfName(varNome, cliente):
+    for nome in lista_usuarios:
+        if varNome == lista_usuarios[nome]:
+            cliente.send(bytes("Usuário já existe", "utf8"))
             return False
     print("O nome do usuário é ", varNome)      
-    client.send(bytes(('Bem-Vindo %s! Se desejar sair, digite {sair}.' % varNome), "utf8"))
-    # msg = " has joined the chat!" % varNome 
-    for sock in clients:
+    cliente.send(bytes(('Usuário %s cadastrado.' % varNome), "utf8"))
+    cliente.send(bytes(('Se desejar sair, digite {sair}.'), "utf8"))
+    for sock in lista_usuarios:
         sock.send(bytes(varNome+" Entrou!" , "utf8"))
-    # broadcast(bytes(msg, "utf8"))
-    clients[client] = varNome
+    lista_usuarios[cliente] = varNome
     return True
 
-clients = {}
-addresses = {}
+def conectar_ao_usuario():
+    while True:
+        cliente, cliente_address = SERVER.accept()
+        print("%s|%s entrou" % cliente_address)
+        cliente.send(bytes("Digite seu nome", "utf8"))
+        enderecos[cliente] = cliente_address
+        Thread(target=tratamento_nome_e_mensagem, args=(cliente,)).start()
+        list(cliente)
+
 
 
 TAM_BUFFER = 1024
 HOST = ''
 PORT = 5000
 ADDR = (HOST, PORT)
-
 SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDR)
-
-
 SERVER.listen(5)
 print("Aguardando Conexão...")
-ACCEPT_THREAD = Thread(target=conectar_ao_usuario)
-ACCEPT_THREAD.start()
-ACCEPT_THREAD.join()
+RECEBE_THREAD = Thread(target=conectar_ao_usuario)
+RECEBE_THREAD.start()
+RECEBE_THREAD.join()
 SERVER.close()
