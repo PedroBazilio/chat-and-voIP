@@ -14,6 +14,7 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
     vrf = False
     while True:
         mensagem = cliente.recv(TAM_BUFFER)   #String escrita pelo usuário
+        
         out = '{sair}'
         quit = bytes(out, 'utf-8')
 

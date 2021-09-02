@@ -1,6 +1,50 @@
 from tkinter import *
 from threading import *
 import socket
+import pyaudio
+
+
+def audio(socket):
+
+    audio_format = pyaudio.paInt16
+    channels = 1
+    rate = 20000
+    
+    
+    nome = mensagem.get()
+    mensagem.set("")
+    socket.send(bytes(nome, "utf8"))
+
+    socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    py_audio = pyaudio.PyAudio()
+    playing_stream = pyaudio.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=chunk_size)
+    recording_stream = pyaudio.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=chunk_size)
+
+    receive_thread = Thread(target=receive_server_data, args=(socket_audio, playing_stream)).start()
+    send_data_to_server(socket_audio, recording_stream)
+
+
+
+
+def receive_server_data(socket, play_stream):
+    while True:
+        try:
+            data = socket.recv(1024)
+            play_stream.write(data)
+        except:
+            pass
+
+def send_data_to_server(socket, record_stream):
+    while True:
+        try:
+            data = record_stream.read(1024)
+            socket.sendall(data)
+        except:
+            pass
+
+
+
 
 def fecha_tela(event=None):  #Fecha a tela pelo X, fazendo o mesmo processo de quando se escreve {sair}
     
