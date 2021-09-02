@@ -15,6 +15,23 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
     while True:
         mensagem = cliente.recv(TAM_BUFFER)   #String escrita pelo usuário
         
+        
+        var_audio = '!@#$%'
+        audio = bytes(var_audio, 'utf8')
+        if mensagem == audio:
+            while True:#sera se eu preciso desse while?
+                cliente.send(bytes("Digite o nome do usuario desejado: ", 'utf8'))
+                nome = cliente.recv(TAM_BUFFER).decode("utf8")
+                for cli, addr in zip(lista_usuarios, enderecos): #procura pelo nome
+                    if nome == lista_usuarios[cli]:
+                        #como mandar a solicitação pro cliente desejado?
+                    
+                else: 
+                    #mensagens de erro vem aqui 
+                    
+                    False
+        
+        
         out = '{sair}'
         quit = bytes(out, 'utf-8')
 
@@ -41,7 +58,8 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
             else:
                 cliente.send(bytes("{sair}", "utf8"))  #Cliente se desliga do servidor e aplicação é fechada
                 cliente.close()
-                del lista_usuarios[cliente] #deleta o usuário da lista de usuários
+                lista_usuarios.remove(cliente)
+                #del lista_usuarios[cliente] #deleta o usuário da lista de usuários
                 for sock in lista_usuarios:
                     sock.send(bytes(name+" Saiu." , "utf8"))
                 break   
