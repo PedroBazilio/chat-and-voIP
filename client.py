@@ -86,6 +86,17 @@ def liga(event=None):
         nomePesquisa.pack(side=LEFT, expand=True)
         botao_nome = Button(janela_ligacao, text="Ligar")
         botao_nome.pack()
+
+        #vai receber socket com a mensagen de controle podendo ser:
+        #1 - usuario não existe
+        #2 - usuario ocupado
+        #3 - usuario negou a chamada
+        #4 - usuario aceitou a chamada
+        #a partir de 4, temos:
+        #recebimento de socket tcp com nome e porta do cliente a ser feita a ligação
+        # usamos o socket udp com a porta desejada para começar a mandar audio  
+        
+
     else:
         janela_no_name = tkinter.Toplevel()
         janela_no_name.geometry("200x20")
