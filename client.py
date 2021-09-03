@@ -85,7 +85,6 @@ def liga(event=None):
         nomePesquisa.bind("<Return>", enviar_msg) 
         nomePesquisa.pack(side=LEFT, expand=True)
         botao_nome = Button(janela_ligacao, text="Ligar")
-        botao_nome.bind("<Return>", enviar_msg) 
         botao_nome.pack()
     else:
         janela_no_name = tkinter.Toplevel()
