@@ -15,22 +15,20 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
     while True:
         mensagem = cliente.recv(TAM_BUFFER)   #String escrita pelo usuário
         
-        
-        var_audio = '!@#$%'
-        audio = bytes(var_audio, 'utf8')
-        if mensagem == audio:
-            while True:#sera se eu preciso desse while?
-                cliente.send(bytes("Digite o nome do usuario desejado: ", 'utf8'))
-                nome = cliente.recv(TAM_BUFFER).decode("utf8")
-                for cli, addr in zip(lista_usuarios, enderecos): #procura pelo nome
-                    if nome == lista_usuarios[cli]:
-                        #como mandar a solicitação pro cliente desejado?
-                    
-                else: 
-                    #mensagens de erro vem aqui 
-                    
-                    False
-        
+        estaNaLista = False
+        # var_audio = '!@#$%'
+        # audio = bytes(var_audio, 'utf8')
+        # if mensagem == audio:
+        #     cliente.send(bytes("Digite o nome do usuario desejado: ", 'utf8'))
+        #     nome = cliente.recv(TAM_BUFFER).decode("utf8")
+        #     for cli, addr in zip(lista_usuarios, enderecos): #procura pelo nome
+        #         if nome == lista_usuarios[cli]:
+        #             estaNaLista = True
+        #             #como mandar a solicitação pro cliente desejado?
+                
+        #     if(estaNaLista == True):
+                
+    
         
         out = '{sair}'
         quit = bytes(out, 'utf-8')
@@ -50,19 +48,18 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
 
             if mensagem == lista1:
                 list(cliente) #caso o usuário tenha escrito "list" para listar todos os usuários presentes
-
-            elif mensagem != quit:
-                for sock in lista_usuarios:  #Manda a mensagem escrita pelo usuário para todos e para si mesmo, mostrando o nome de quem mandou
-                    sock.send(bytes(name+": ", "utf8")+mensagem)
-            
-            else:
-                cliente.send(bytes("{sair}", "utf8"))  #Cliente se desliga do servidor e aplicação é fechada
-                cliente.close()
-                lista_usuarios.remove(cliente)
-                #del lista_usuarios[cliente] #deleta o usuário da lista de usuários
+            elif mensagem == quit: 
+                cliente.close()   #Cliente se desliga do servidor e aplicação é fechada
+                del lista_usuarios[cliente] #deleta o usuário da lista de usuários
                 for sock in lista_usuarios:
                     sock.send(bytes(name+" Saiu." , "utf8"))
                 break   
+
+
+            else:
+                for sock in lista_usuarios:  #Manda a mensagem escrita pelo usuário para todos e para si mesmo, mostrando o nome de quem mandou
+                    sock.send(bytes(name+": ", "utf8")+mensagem)
+            
 
 def list(cliente):   #Recebe o socket do cliente para printar para ele os usuários presentes
     for cli, addr in zip(lista_usuarios, enderecos):   #for por todos os usuários
@@ -98,6 +95,7 @@ def vrfName(varNome, cliente):  #Recebe o nome digitado pelo usuário e o socket
     cliente.send(bytes(('Se desejar sair, digite {sair}.'), "utf8"))
     for sock in lista_usuarios:  #mostra para todos os usuários o nome da pessoa que entrou
         sock.send(bytes(varNome+" Entrou!" , "utf8"))
+    cliente.send(bytes('NOME'+varNome, "utf8"))
     lista_usuarios[cliente] = varNome #adiciona o nome da lista para que não seja aceito repetições
     return True
 

@@ -1,8 +1,11 @@
 from tkinter import *
 from threading import *
 import socket
+import tkinter
 import pyaudio
 
+
+count = 0
 
 def audio(socket):
 
@@ -56,11 +59,15 @@ def recebe():    #Recebe a mensagem do server já tratada
         try:
             msg = socket_do_cliente.recv(TAM_BUFFER).decode("utf8")
             lista_de_mensagens.insert(END, msg)
+            if(msg.startswith('NOME')):
+                nome_principal = 
         except OSError:
             break
 
 
 def enviar_msg(event=None):  #Enviar a mensagem para o server para ser tratada
+    count = 1
+    print(count)
     msg = mensagem.get()
     mensagem.set("")
     socket_do_cliente.send(bytes(msg, "utf8"))
@@ -68,10 +75,31 @@ def enviar_msg(event=None):  #Enviar a mensagem para o server para ser tratada
         socket_do_cliente.close()
         tk.quit()
 
+def liga(event=None):
+    print(count)
+    if(count == 1):
+        janela_ligacao = tkinter.Toplevel()
+        janela_ligacao.wm_title()
+        nome = StringVar()
+        nomePesquisa = Entry(janela_ligacao, textvariable=nome) 
+        nomePesquisa.bind("<Return>", enviar_msg) 
+        nomePesquisa.pack(side=LEFT, expand=True)
+        botao_nome = Button(janela_ligacao, text="Ligar")
+        botao_nome.bind("<Return>", enviar_msg) 
+        botao_nome.pack()
+    else:
+        janela_no_name = tkinter.Toplevel()
+        janela_no_name.geometry("200x20")
+        janela_no_name.wm_title()
+        text = Label(janela_no_name, text='Você não digitou seu nome ainda!!!')
+        text.pack()
+        # mensagem_no_name = 'Você não digitou seu nome ainda!!!'
 
+    # socket_do_cliente.send(bytes('!@#$%'))
+
+nome_principal = ''
 tk = Tk()
 tk.title("Chat")
-
 frame = Frame()  #Cria um frame
 
 scrollbar = Scrollbar(frame)   #Cria uma scrollbar 
@@ -92,6 +120,13 @@ entrada.pack(side=LEFT, expand=True)   #Adiciona o local
 
 botao_mensagem = Button(tk, text="Enviar", command=enviar_msg)  #Funciona do mesmo jeito que apertar Enter para receber a string escrita
 botao_mensagem.pack(side=LEFT)     #Cria o botão na tela do lado esquerdo
+
+botao_pesquisa = Button(tk, text="Pesquisar")
+botao_pesquisa.pack(side=LEFT)    
+
+botao_chamada = Button(tk, text="Ligar", command=liga)
+botao_chamada.pack(side=LEFT)
+
 
 tk.protocol("WM_DELETE_WINDOW", fecha_tela)   #Para fechar a tela
 
