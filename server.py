@@ -16,20 +16,22 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
         mensagem = cliente.recv(TAM_BUFFER)   #String escrita pelo usuário
         
         estaNaLista = False
-        # var_audio = '!@#$%'
-        # audio = bytes(var_audio, 'utf8')
-        # if mensagem == audio:
-        #     cliente.send(bytes("Digite o nome do usuario desejado: ", 'utf8'))
-        #     nome = cliente.recv(TAM_BUFFER).decode("utf8")
+        var_audio = '!@#$%'
+        audio = bytes(var_audio, 'utf8')
+        # if mensagem.startswith('!@#$%') == audio:
+        #     nome = mensagem[5:]
         #     for cli, addr in zip(lista_usuarios, enderecos): #procura pelo nome
         #         if nome == lista_usuarios[cli]:
         #             estaNaLista = True
-        #             #como mandar a solicitação pro cliente desejado?
+        #             break
+        #     if(estaNaLista):
+        #         addr.send(bytes("recebe_ligacao", "utf8"))
+                    #como mandar a solicitação pro cliente desejado?
                 
         #     if(estaNaLista == True):
-                
-    
+                    
         
+            
         out = '{sair}'
         quit = bytes(out, 'utf-8')
 
@@ -37,13 +39,12 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
         lista1 = bytes(lista, 'utf-8')
         
         search = decodeVar(mensagem) #Verificação se a palavra "Pesquisa" foi escrita
-        if search == True:
-
-            tamMsg = len(mensagem)
-            slice_obj = slice(9, tamMsg)
-            Name = mensagem[slice_obj]
-            nome_decodeVar = str(Name, 'utf-8')
-            listUsr(nome_decodeVar, cliente) #Chama a função para procurar o usuário
+        
+        if mensagem.startswith(bytes("Pesquisa", "utf8")):
+            mensagem = mensagem.decode('utf8')
+            mensagem = mensagem[9:]
+            print(mensagem)
+            listUsr(mensagem, cliente) #Chama a função para procurar o usuário
         else:
 
             if mensagem == lista1:
@@ -53,13 +54,12 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
                 del lista_usuarios[cliente] #deleta o usuário da lista de usuários
                 for sock in lista_usuarios:
                     sock.send(bytes(name+" Saiu." , "utf8"))
-                break   
+                break
 
 
             else:
                 for sock in lista_usuarios:  #Manda a mensagem escrita pelo usuário para todos e para si mesmo, mostrando o nome de quem mandou
                     sock.send(bytes(name+": ", "utf8")+mensagem)
-            
 
 def list(cliente):   #Recebe o socket do cliente para printar para ele os usuários presentes
     for cli, addr in zip(lista_usuarios, enderecos):   #for por todos os usuários
