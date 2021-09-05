@@ -22,8 +22,8 @@ def audio(socket):
     socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     py_audio = pyaudio.PyAudio()
-    playing_stream = pyaudio.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=chunk_size)
-    recording_stream = pyaudio.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=chunk_size)
+    playing_stream = pyaudio.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=TAM_BUFFER)
+    recording_stream = pyaudio.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=TAM_BUFFER)
 
     receive_thread = Thread(target=receive_server_data, args=(socket_audio, playing_stream)).start()
     send_data_to_server(socket_audio, recording_stream)
@@ -175,6 +175,7 @@ PORT = 5000
 ADDR = (HOST, PORT)
 
 socket_do_cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #Cria o socket com o protocolo TCP por meio do socket.SOCK_STREAM
+print(ADDR)
 socket_do_cliente.connect(ADDR)    #Conecta o socket do usuário na porta 5000
 recebe_thread = Thread(target=recebe) 
 recebe_thread.start()
