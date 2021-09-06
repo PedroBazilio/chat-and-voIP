@@ -171,10 +171,10 @@ tk.protocol("WM_DELETE_WINDOW", fecha_tela)   #Para fechar a tela
 
 TAM_BUFFER = 1024   #Variáveis para socket
 HOST = socket.gethostbyname(socket.gethostname())
-PORT = 5000    
+PORT = 6000    
 ADDR = (HOST, PORT)
 
-socket_do_cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #Cria o socket com o protocolo TCP por meio do socket.SOCK_STREAM
+socket_do_cliente = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  #Cria o socket com o protocolo TCP por meio do socket.SOCK_STREAM
 print(ADDR)
 socket_do_cliente.connect(ADDR)    #Conecta o socket do usuário na porta 5000
 recebe_thread = Thread(target=recebe) 

@@ -112,9 +112,9 @@ def conectar_ao_usuario():    #Função para receber o socket do usuário e cone
 
 TAM_BUFFER = 1024
 HOST = ''
-PORT = 5000   #Porta 5000 especificada para uso do servidor
+PORT = 6000   #Porta 5000 especificada para uso do servidor
 ADDR = (HOST, PORT)
-SERVER = socket(AF_INET, SOCK_STREAM)
+SERVER = socket(AF_INET, socket.SOCK_DGRAM)
 SERVER.bind(ADDR) 
 SERVER.listen(5)
 print("Aguardando Conexão...")
