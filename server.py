@@ -1,5 +1,6 @@
-from socket import AF_INET, socket, SOCK_STREAM
+from socket import AF_INET, socket, SOCK_STREAM, SOCK_DGRAM
 from threading import Thread
+import pyaudio
 
 enderecos = {}
 lista_usuarios = {}
@@ -18,19 +19,28 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
         estaNaLista = False
         var_audio = '!@#$%'
         audio = bytes(var_audio, 'utf8')
-        # if mensagem.startswith('!@#$%') == audio:
-        #     nome = mensagem[5:]
-        #     for cli, addr in zip(lista_usuarios, enderecos): #procura pelo nome
-        #         if nome == lista_usuarios[cli]:
-        #             estaNaLista = True
-        #             break
-        #     if(estaNaLista):
-        #         addr.send(bytes("recebe_ligacao", "utf8"))
-                    #como mandar a solicitação pro cliente desejado?
+
+
+        if mensagem.startswith(audio):
+          
+            nome = mensagem[5:]
+            for cli, addr_dest in zip(lista_usuarios, enderecos): #procura pelo nome
+                if nome == lista_usuarios[cli]:
+                    estaNaLista = True
+                    break
+            if(estaNaLista):
+                addr_dest.send(bytes("recebe_ligacao", "utf8"))
+                addr_remet = enderecos[cliente]
                 
-        #     if(estaNaLista == True):
-                    
-        
+
+                
+                
+                
+                # rt = Thread(target=recebethread, args=(cliente,))
+                # st = Thread(target=mandathread, args=(cliente,))
+                # rt.start()
+                # st.start()
+                
             
         out = '{sair}'
         quit = bytes(out, 'utf-8')
@@ -90,9 +100,11 @@ def vrfName(varNome, cliente):  #Recebe o nome digitado pelo usuário e o socket
         if varNome == lista_usuarios[nome]:
             cliente.send(bytes("Usuário já existe", "utf8"))
             return False   #retorna false se o nome já estiver na lista para que entre no while e saia apenas quando o nome for válido
+    
     print("O nome do usuário é ", varNome)      
     cliente.send(bytes(('Usuário %s cadastrado.' % varNome), "utf8"))
     cliente.send(bytes(('Se desejar sair, digite {sair}.'), "utf8"))
+    
     for sock in lista_usuarios:  #mostra para todos os usuários o nome da pessoa que entrou
         sock.send(bytes(varNome+" Entrou!" , "utf8"))
     cliente.send(bytes('NOME'+varNome, "utf8"))
@@ -109,14 +121,53 @@ def conectar_ao_usuario():    #Função para receber o socket do usuário e cone
         list(cliente)
 
 
+# def recebethread(socket_audio):
+    
+#     while True:
+#         data, address = socket_audio.recvfrom(TAM_BUFFER)
+#         recebe_stream.write(data)
+
+
+# def mandathread(socket_audio):
+    
+#     addr = enderecos[socket_audio]
+#     while True:
+#         data, address = socket_audio.recvfrom(TAM_BUFFER)
+#         socket_audio.sendto(data, address)
+
+
+
 
 TAM_BUFFER = 1024
+audio_format = pyaudio.paInt16
+channels = 1
+rate = 20000
+PORT_AUDIO = 6000
+
+AUDIO = pyaudio.PyAudio()
+recebe_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=TAM_BUFFER)
+    
+
+
 HOST = ''
+
+
+PORT_AUDIO = 6000
 PORT = 5000   #Porta 5000 especificada para uso do servidor
+
+
 ADDR = (HOST, PORT)
+ADDR_AUDIO = (HOST, PORT_AUDIO)
+
 SERVER = socket(AF_INET, SOCK_STREAM)
-SERVER.bind(ADDR) 
+SERVER_AUDIO = socket(AF_INET, SOCK_DGRAM)
+
+SERVER.bind(ADDR)
+SERVER_AUDIO.bind(ADDR_AUDIO) 
 SERVER.listen(5)
+
+
+
 print("Aguardando Conexão...")
 RECEBE_THREAD = Thread(target=conectar_ao_usuario)
 RECEBE_THREAD.start()

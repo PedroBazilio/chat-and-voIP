@@ -1,3 +1,4 @@
+
 from tkinter import *
 from threading import *
 from functools import partial
@@ -13,52 +14,56 @@ def audio(socket):
     audio_format = pyaudio.paInt16
     channels = 1
     rate = 20000
+    PORT_AUDIO = 6000
+    SERVER_BIND = (HOST, PORT_AUDIO)
+
     
+    socket.connect((HOST, PORT_AUDIO))
+    # socket_audio.bind((HOST, PORT_AUDIO))
+
+
+    AUDIO = pyaudio.PyAudio()
+    recebe_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=TAM_BUFFER)
+    envia_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=TAM_BUFFER)
+
+    recebe_thread = Thread(target=recebe_voz, args=(recebe_stream)).start()
+    transmite_thread = Thread(target=envia_voz, args=(socket_audio, envia_stream, SERVER_BIND))
     
-    nome = mensagem.get()
-    mensagem.set("")
-    socket.send(bytes(nome, "utf8"))
-
-    socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-    py_audio = pyaudio.PyAudio()
-    playing_stream = pyaudio.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=TAM_BUFFER)
-    recording_stream = pyaudio.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=TAM_BUFFER)
-
-    receive_thread = Thread(target=receive_server_data, args=(socket_audio, playing_stream)).start()
-    send_data_to_server(socket_audio, recording_stream)
 
 
-
-
-def receive_server_data(socket, play_stream):
+def recebe_voz(recebe_dado):
     while True:
         try:
-            data = socket.recv(1024)
-            play_stream.write(data)
+            data = socket.recv(TAM_BUFFER)
+            recebe_dado.write(data)
         except:
             pass
 
-def send_data_to_server(socket, record_stream):
+def envia_voz(socket, manda_dado, ServerBind):
     while True:
         try:
-            data = record_stream.read(1024)
-            socket.sendall(data)
+            data = manda_dado.read(TAM_BUFFER)
+            socket.sendto(data, ServerBind )
         except:
             pass
 
-# def aceitar_chamada():
-    
+def aceitar_chamada(janela):
+    janela.quit()
+    socket_do_cliente.send(bytes(")(*&", ))
+    audio(socket_audio)
+
+
 
 # def recusar_chamada():
 
-# def controle_chamada():
-#     janela_aceita = tkinter.Toplevel()
-#     janela_aceita.wm_title("Recebendo chamada")
-#     botao_aceitar = Button(janela_aceita, text="Aceitar", command=aceitar_chamada())
-#     botao_aceitar.pack()
-#     botao_recursar = Button(janela_aceita, text="Recusar", command=recursar_chamada())
-#     botao_recursar.pack()
+def controle_chamada():
+    janela_aceita = tkinter.Toplevel()
+    janela_aceita.wm_title("Recebendo chamada")
+    botao_aceitar = Button(janela_aceita, text="Aceitar", command=lambda: aceitar_chamada(janela_aceita))
+    botao_aceitar.pack()
+
+    botao_recursar = Button(janela_aceita, text="Recusar", command= lambda: recusar_chamada(janela_aceita))
+    botao_recursar.pack()
 
 def fecha_tela(event=None):  #Fecha a tela pelo X, fazendo o mesmo processo de quando se escreve {sair}
     
@@ -70,8 +75,8 @@ def recebe():    #Recebe a mensagem do server já tratada
         try:
             msg = socket_do_cliente.recv(TAM_BUFFER).decode("utf8")
             lista_de_mensagens.insert(END, msg)
-            # if(msg == "recebe_ligacao"):
-            #     resposta = controle_chamada()
+            if(msg == "recebe_ligacao"):
+                resposta = controle_chamada()
         except OSError:
             break
 
@@ -91,10 +96,21 @@ def enviar_nome():
     mensagem2.set("")
     socket_do_cliente.send(bytes(msg, "utf8"))
 
+
+def envia_string():
+    msg = "!@#$%" + mensagem2.get()
+    mensagem2.set("")
+    socket_do_cliente.send(bytes(msg, "utf8"))
+    var = socket_audio
+    print(var)
+    socket_do_cliente.send(var)
+    
+
 def func_pesquisa():
     janela_pesquisa = tkinter.Toplevel()
     janela_pesquisa.wm_title("Pesquisa") 
-    entrada_nome = Entry(janela_pesquisa, textvariable=mensagem2)  
+    entrada_nome = Entry(janela_pesquisa, textvariable=mensagem2)
+
     entrada_nome.bind("<Return>", enviar_nome)    
     entrada_nome.pack()
     botao_nome = Button(janela_pesquisa, text="Pesquisar", command=enviar_nome)
@@ -104,13 +120,16 @@ def func_pesquisa():
 
 def liga(event=None):
     print(count)
-    if(count == 1):
+    if(count == 0):
         janela_ligacao = tkinter.Toplevel()
         janela_ligacao.wm_title("Ligar")
-        nomePesquisa = Entry(janela_ligacao, textvariable=mensagem) 
-        nomePesquisa.bind("<Return>", enviar_msg) 
+
+        nomePesquisa = Entry(janela_ligacao, textvariable=mensagem2) 
+        nomePesquisa.bind("<Return>", envia_string) 
         nomePesquisa.pack(side=LEFT, expand=True)
-        botao_nome = Button(janela_ligacao, text="Ligar")
+        
+        
+        botao_nome = Button(janela_ligacao, text="Ligar", command=envia_string)
         botao_nome.pack()
 
         #vai receber socket com a mensagen de controle podendo ser:
@@ -174,9 +193,17 @@ HOST = socket.gethostbyname(socket.gethostname())
 PORT = 5000    
 ADDR = (HOST, PORT)
 
+socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+socket_audio.connect((HOST, 6000))
+print(socket_audio.getsockname)
+print(socket)
+
+
 socket_do_cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #Cria o socket com o protocolo TCP por meio do socket.SOCK_STREAM
+
 print(ADDR)
 socket_do_cliente.connect(ADDR)    #Conecta o socket do usuário na porta 5000
+print(socket_do_cliente)
 recebe_thread = Thread(target=recebe) 
 recebe_thread.start()
 mainloop()
