@@ -124,7 +124,12 @@ def func_pesquisa():
     entrada_nome.pack()
     botao_nome = Button(janela_pesquisa, text="Pesquisar", command=lambda:enviar_nome(janela_pesquisa))
     botao_nome.pack()
-    
+
+def sair():
+    socket_do_cliente.send(bytes("{sair}", "utf8"))
+    socket_do_cliente.close()
+    tk.quit()
+
 def conectar_remetente():
     print('conectei')
     audio()
@@ -144,15 +149,6 @@ def liga(event=None):
         socket_audio.bind(('', PORT_AUDIO))
         Thread(target=conectar_remetente).start()
         
-
-        #vai receber socket com a mensagen de controle podendo ser:
-        #1 - usuario não existe
-        #2 - usuario ocupado
-        #3 - usuario negou a chamada
-        #4 - usuario aceitou a chamada
-        #a partir de 4, temos:
-        #recebimento de socket tcp com nome e porta do cliente a ser feita a ligação
-        # usamos o socket udp com a porta desejada para começar a mandar audio  
         
 
     else:
@@ -196,6 +192,9 @@ botao_pesquisa = Button(tk, text="Pesquisar", command=func_pesquisa)
 botao_pesquisa.pack(side=LEFT)    
 
 botao_chamada = Button(tk, text="Ligar", command=liga)
+botao_chamada.pack(side=LEFT)
+
+botao_chamada = Button(tk, text="Sair", command=sair)
 botao_chamada.pack(side=LEFT)
 
 
