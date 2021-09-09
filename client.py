@@ -104,7 +104,7 @@ def enviar_msg(event=None):  #Enviar a mensagem para o server para ser tratada
 def enviar_nome(janela):
     msg = "Pesquisa " + mensagem2.get()
     mensagem2.set("")
-    # janela.destroy()
+    janela.destroy()
     socket_do_cliente.send(bytes(msg, "utf8"))
 
 
