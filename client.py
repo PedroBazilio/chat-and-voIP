@@ -9,7 +9,7 @@ import pyaudio
 
 count = 0
 
-def audio(socket, enderec):
+def audio():
 
     audio_format = pyaudio.paInt16
     channels = 1
@@ -21,7 +21,7 @@ def audio(socket, enderec):
     # socket.connect((HOST, PORT_AUDIO))
     # socket_audio.bind((HOST, PORT_AUDIO))
 
-
+    print(socket_audio)
     AUDIO = pyaudio.PyAudio()
     recebe_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=TAM_BUFFER)
     envia_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=TAM_BUFFER)
@@ -34,10 +34,12 @@ def audio(socket, enderec):
 
 
 def recebe_voz(recebe_dado, socket):
+   
     while True:
         try:
-            data, servidor = socket.recv(TAM_BUFFER)
-            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            
+            data, servidor = socket.recvfrom(TAM_BUFFER * 4)
+            print(data)
             recebe_dado.write(data)
         except:
             pass
@@ -45,15 +47,19 @@ def recebe_voz(recebe_dado, socket):
 def envia_voz(socket, manda_dado):
     while True:
         try:
+            
             data = manda_dado.read(TAM_BUFFER)
-            socket.sendall(data)
+            print(data)
+            socket.send(data)
+
         except:
             pass
 
 def aceitar_chamada():
     socket_audio.connect((HOST, PORT_AUDIO))
+    print(socket_audio)
     socket_do_cliente.send(bytes("**", "utf8"))
-    audio(socket_audio, '')
+    audio()
 
 
 
@@ -120,11 +126,8 @@ def func_pesquisa():
     botao_nome.pack()
     
 def conectar_remetente():
-    end = socket_do_cliente.recv(TAM_BUFFER).decode("utf8")
-    print(end)
-    end_porta = int(end[13:])
-    print(end_porta)
-    audio(socket_audio, end_porta)
+    print('conectei')
+    audio()
 
 def liga(event=None):
     if(count == 0):
@@ -211,7 +214,7 @@ socket_do_cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #Cria o s
 
 
 socket_do_cliente.connect(ADDR)    #Conecta o socket do usuário na porta 5000
-
+print(socket_do_cliente)
 recebe_thread = Thread(target=recebe) 
 recebe_thread.start()
 mainloop()

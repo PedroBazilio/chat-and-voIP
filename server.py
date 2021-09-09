@@ -36,13 +36,14 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
                     break
             if(estaNaLista):
                 addr_dest.send(bytes("recebe_ligacao", "utf8"))
-                resposta_ligacao = addr_dest.recv(TAM_BUFFER).decode("utf8")
-                controle_ligacao = bytes("**", 'utf8')
-                if(resposta_ligacao == controle_ligacao):
-                    ip1, end = enderecos[addr_dest]
-                    ip1 = str(ip1)
-                    end = str(end)
-                    cliente.send(bytes(ip1+","+end, "utf8")) 
+                # resposta_ligacao = addr_dest.recv(TAM_BUFFER).decode("utf8")
+                # controle_ligacao = bytes("**", 'utf8')
+                # print('estou aqui')
+                # if(resposta_ligacao == controle_ligacao):
+                #     ip1, end = enderecos[addr_dest]
+                #     ip1 = str(ip1)
+                #     end = str(end)
+                #     cliente.send(bytes(ip1+","+end, "utf8")) 
 
         elif mensagem.startswith(bytes("Pesquisa", "utf8")):
             mensagem = mensagem.decode('utf8')
@@ -144,6 +145,7 @@ SERVER = socket(AF_INET, SOCK_STREAM)
 
 
 SERVER.bind(ADDR)
+print(SERVER)
 SERVER.listen(5)
 
 
