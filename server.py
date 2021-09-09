@@ -20,37 +20,31 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
         var_audio = '!@#$%'
         audio = bytes(var_audio, 'utf8')
 
+        out = '{sair}'
+        quit = bytes(out, 'utf-8')
+        lista = 'list'
+        lista1 = bytes(lista, 'utf-8')
+        
+        search = decodeVar(mensagem) #Verificação se a palavra "Pesquisa" foi escrita
 
         if mensagem.startswith(audio):
-          
             nome = mensagem[5:]
+            nome = nome.decode('utf8')
             for cli, addr_dest in zip(lista_usuarios, enderecos): #procura pelo nome
                 if nome == lista_usuarios[cli]:
                     estaNaLista = True
                     break
             if(estaNaLista):
                 addr_dest.send(bytes("recebe_ligacao", "utf8"))
-                addr_remet = enderecos[cliente]
-                
+                resposta_ligacao = addr_dest.recv(TAM_BUFFER).decode("utf8")
+                controle_ligacao = bytes("**", 'utf8')
+                if(resposta_ligacao == controle_ligacao):
+                    ip1, end = enderecos[addr_dest]
+                    ip1 = str(ip1)
+                    end = str(end)
+                    cliente.send(bytes(ip1+","+end, "utf8")) 
 
-                
-                
-                
-                # rt = Thread(target=recebethread, args=(cliente,))
-                # st = Thread(target=mandathread, args=(cliente,))
-                # rt.start()
-                # st.start()
-                
-            
-        out = '{sair}'
-        quit = bytes(out, 'utf-8')
-
-        lista = 'list'
-        lista1 = bytes(lista, 'utf-8')
-        
-        search = decodeVar(mensagem) #Verificação se a palavra "Pesquisa" foi escrita
-        
-        if mensagem.startswith(bytes("Pesquisa", "utf8")):
+        elif mensagem.startswith(bytes("Pesquisa", "utf8")):
             mensagem = mensagem.decode('utf8')
             mensagem = mensagem[9:]
             print(mensagem)
@@ -121,19 +115,6 @@ def conectar_ao_usuario():    #Função para receber o socket do usuário e cone
         list(cliente)
 
 
-# def recebethread(socket_audio):
-    
-#     while True:
-#         data, address = socket_audio.recvfrom(TAM_BUFFER)
-#         recebe_stream.write(data)
-
-
-# def mandathread(socket_audio):
-    
-#     addr = enderecos[socket_audio]
-#     while True:
-#         data, address = socket_audio.recvfrom(TAM_BUFFER)
-#         socket_audio.sendto(data, address)
 
 
 
@@ -160,10 +141,9 @@ ADDR = (HOST, PORT)
 ADDR_AUDIO = (HOST, PORT_AUDIO)
 
 SERVER = socket(AF_INET, SOCK_STREAM)
-SERVER_AUDIO = socket(AF_INET, SOCK_DGRAM)
+
 
 SERVER.bind(ADDR)
-SERVER_AUDIO.bind(ADDR_AUDIO) 
 SERVER.listen(5)
 
 

@@ -9,16 +9,16 @@ import pyaudio
 
 count = 0
 
-def audio(socket):
+def audio(socket, enderec):
 
     audio_format = pyaudio.paInt16
     channels = 1
     rate = 20000
-    PORT_AUDIO = 6000
-    SERVER_BIND = (HOST, PORT_AUDIO)
+    
+    # SERVER_BIND = (HOST, PORT_AUDIO)
 
     
-    socket.connect((HOST, PORT_AUDIO))
+    # socket.connect((HOST, PORT_AUDIO))
     # socket_audio.bind((HOST, PORT_AUDIO))
 
 
@@ -26,31 +26,33 @@ def audio(socket):
     recebe_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=TAM_BUFFER)
     envia_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=TAM_BUFFER)
 
-    recebe_thread = Thread(target=recebe_voz, args=(recebe_stream)).start()
-    transmite_thread = Thread(target=envia_voz, args=(socket_audio, envia_stream, SERVER_BIND))
-    
+    recebe_thread = Thread(target=recebe_voz, args=(recebe_stream))
+    transmite_thread = Thread(target=envia_voz, args=(socket_audio, envia_stream, enderec))
+
+    recebe_thread.start()
+    transmite_thread.start()
 
 
 def recebe_voz(recebe_dado):
     while True:
         try:
-            data = socket.recv(TAM_BUFFER)
+            data, servidor = socket.recv(TAM_BUFFER)
             recebe_dado.write(data)
         except:
             pass
 
-def envia_voz(socket, manda_dado, ServerBind):
+def envia_voz(socket, manda_dado, enderec):
     while True:
         try:
             data = manda_dado.read(TAM_BUFFER)
-            socket.sendto(data, ServerBind )
+            socket.sendto(data, (enderec, PORT_AUDIO))
         except:
             pass
 
-def aceitar_chamada(janela):
-    janela.quit()
-    socket_do_cliente.send(bytes(")(*&", ))
-    audio(socket_audio)
+def aceitar_chamada():
+    socket_audio.connect((HOST, PORT_AUDIO))
+    socket_do_cliente.send(bytes("**", "utf8"))
+    audio(socket_audio, '')
 
 
 
@@ -59,7 +61,7 @@ def aceitar_chamada(janela):
 def controle_chamada():
     janela_aceita = tkinter.Toplevel()
     janela_aceita.wm_title("Recebendo chamada")
-    botao_aceitar = Button(janela_aceita, text="Aceitar", command=lambda: aceitar_chamada(janela_aceita))
+    botao_aceitar = Button(janela_aceita, text="Aceitar", command=lambda: aceitar_chamada())
     botao_aceitar.pack()
 
     botao_recursar = Button(janela_aceita, text="Recusar", command= lambda: recusar_chamada(janela_aceita))
@@ -74,9 +76,10 @@ def recebe():    #Recebe a mensagem do server já tratada
     while True:
         try:
             msg = socket_do_cliente.recv(TAM_BUFFER).decode("utf8")
-            lista_de_mensagens.insert(END, msg)
             if(msg == "recebe_ligacao"):
                 resposta = controle_chamada()
+            else:
+                lista_de_mensagens.insert(END, msg)
         except OSError:
             break
 
@@ -91,19 +94,18 @@ def enviar_msg(event=None):  #Enviar a mensagem para o server para ser tratada
         socket_do_cliente.close()
         tk.quit()
 
-def enviar_nome():
+def enviar_nome(janela):
     msg = "Pesquisa " + mensagem2.get()
     mensagem2.set("")
+    # janela.destroy()
     socket_do_cliente.send(bytes(msg, "utf8"))
 
 
-def envia_string():
+def envia_string(janela):
     msg = "!@#$%" + mensagem2.get()
     mensagem2.set("")
+    # janela.destroy()
     socket_do_cliente.send(bytes(msg, "utf8"))
-    var = socket_audio
-    print(var)
-    socket_do_cliente.send(var)
     
 
 def func_pesquisa():
@@ -113,13 +115,17 @@ def func_pesquisa():
 
     entrada_nome.bind("<Return>", enviar_nome)    
     entrada_nome.pack()
-    botao_nome = Button(janela_pesquisa, text="Pesquisar", command=enviar_nome)
+    botao_nome = Button(janela_pesquisa, text="Pesquisar", command=lambda:enviar_nome(janela_pesquisa))
     botao_nome.pack()
     
-
+def conectar_remetente():
+    end = socket_do_cliente.recv(TAM_BUFFER).decode("utf8")
+    print(end)
+    end_porta = int(end[13:])
+    print(end_porta)
+    audio(socket_audio, end_porta)
 
 def liga(event=None):
-    print(count)
     if(count == 0):
         janela_ligacao = tkinter.Toplevel()
         janela_ligacao.wm_title("Ligar")
@@ -129,8 +135,11 @@ def liga(event=None):
         nomePesquisa.pack(side=LEFT, expand=True)
         
         
-        botao_nome = Button(janela_ligacao, text="Ligar", command=envia_string)
+        botao_nome = Button(janela_ligacao, text="Ligar", command=lambda:envia_string(janela_ligacao))
         botao_nome.pack()
+        socket_audio.bind(('', PORT_AUDIO))
+        Thread(target=conectar_remetente).start()
+        
 
         #vai receber socket com a mensagen de controle podendo ser:
         #1 - usuario não existe
@@ -190,20 +199,18 @@ tk.protocol("WM_DELETE_WINDOW", fecha_tela)   #Para fechar a tela
 
 TAM_BUFFER = 1024   #Variáveis para socket
 HOST = socket.gethostbyname(socket.gethostname())
-PORT = 6000    
+PORT = 5000 
+PORT_AUDIO = 6000   
 ADDR = (HOST, PORT)
 
 socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-socket_audio.connect((HOST, 6000))
-print(socket_audio.getsockname)
-print(socket)
 
 
 socket_do_cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #Cria o socket com o protocolo TCP por meio do socket.SOCK_STREAM
 
-print(ADDR)
+
 socket_do_cliente.connect(ADDR)    #Conecta o socket do usuário na porta 5000
-print(socket_do_cliente)
+
 recebe_thread = Thread(target=recebe) 
 recebe_thread.start()
 mainloop()
