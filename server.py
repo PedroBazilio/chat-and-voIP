@@ -36,14 +36,6 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
                     break
             if(estaNaLista):
                 addr_dest.send(bytes("recebe_ligacao", "utf8"))
-                # resposta_ligacao = addr_dest.recv(TAM_BUFFER).decode("utf8")
-                # controle_ligacao = bytes("**", 'utf8')
-                # print('estou aqui')
-                # if(resposta_ligacao == controle_ligacao):
-                #     ip1, end = enderecos[addr_dest]
-                #     ip1 = str(ip1)
-                #     end = str(end)
-                #     cliente.send(bytes(ip1+","+end, "utf8")) 
 
         elif mensagem.startswith(bytes("Pesquisa", "utf8")):
             mensagem = mensagem.decode('utf8')
@@ -68,7 +60,7 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
 
 def list(cliente):   #Recebe o socket do cliente para printar para ele os usuários presentes
     for cli, addr in zip(lista_usuarios, enderecos):   #for por todos os usuários
-        lista = (f'|Nome: {lista_usuarios[cli]} | IP & Porta: {enderecos[addr]} |\n')
+        lista = (f'\n|Nome: {lista_usuarios[cli]} | IP & Porta: {enderecos[addr]} |\n')
         #print(lista.encode('ascii'))
         cliente.send(lista.encode('ascii'))
 
@@ -102,7 +94,6 @@ def vrfName(varNome, cliente):  #Recebe o nome digitado pelo usuário e o socket
     
     for sock in lista_usuarios:  #mostra para todos os usuários o nome da pessoa que entrou
         sock.send(bytes(varNome+" Entrou!" , "utf8"))
-    cliente.send(bytes('NOME'+varNome, "utf8"))
     lista_usuarios[cliente] = varNome #adiciona o nome da lista para que não seja aceito repetições
     return True
 
@@ -110,10 +101,10 @@ def conectar_ao_usuario():    #Função para receber o socket do usuário e cone
     while True:
         cliente, cliente_address = SERVER.accept()   #recebe o socket e o endereço do cliente
         print("%s|%s entrou" % cliente_address)
-        cliente.send(bytes("Digite seu nome", "utf8"))
+        list(cliente)
+        cliente.send(bytes("Digite seu nome\n", "utf8"))
         enderecos[cliente] = cliente_address   #coloca numa lista o endereço do cliente que está entrando
         Thread(target=tratamento_nome_e_mensagem, args=(cliente,)).start()
-        list(cliente)
 
 
 
@@ -145,7 +136,6 @@ SERVER = socket(AF_INET, SOCK_STREAM)
 
 
 SERVER.bind(ADDR)
-print(SERVER)
 SERVER.listen(5)
 
 
