@@ -49,26 +49,26 @@ def envia_voz(socket, manda_dado):
         try:
             
             data = manda_dado.read(TAM_BUFFER)
-            print(data)
+            #print(data)
             socket.send(data)
 
         except:
             pass
 
-def aceitar_chamada():
+def aceitar_chamada(janela):
     socket_audio.connect((HOST, PORT_AUDIO))
-    print(socket_audio)
-    socket_do_cliente.send(bytes("**", "utf8"))
+    janela.destroy()
     audio()
 
 
 
 # def recusar_chamada():
 
+
 def controle_chamada():
     janela_aceita = tkinter.Toplevel()
     janela_aceita.wm_title("Recebendo chamada")
-    botao_aceitar = Button(janela_aceita, text="Aceitar", command=lambda: aceitar_chamada())
+    botao_aceitar = Button(janela_aceita, text="Aceitar", command=lambda: aceitar_chamada(janela_aceita))
     botao_aceitar.pack()
 
     botao_recursar = Button(janela_aceita, text="Recusar", command= lambda: recusar_chamada(janela_aceita))
