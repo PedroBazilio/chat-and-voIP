@@ -25,27 +25,28 @@ def audio(socket, enderec):
     AUDIO = pyaudio.PyAudio()
     recebe_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=TAM_BUFFER)
     envia_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=TAM_BUFFER)
-
-    recebe_thread = Thread(target=recebe_voz, args=(recebe_stream))
-    transmite_thread = Thread(target=envia_voz, args=(socket_audio, envia_stream, enderec))
+    
+    recebe_thread = Thread(target=recebe_voz, args=(recebe_stream, socket_audio,))
+    transmite_thread = Thread(target=envia_voz, args=(socket_audio, envia_stream,))
 
     recebe_thread.start()
     transmite_thread.start()
 
 
-def recebe_voz(recebe_dado):
+def recebe_voz(recebe_dado, socket):
     while True:
         try:
             data, servidor = socket.recv(TAM_BUFFER)
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
             recebe_dado.write(data)
         except:
             pass
 
-def envia_voz(socket, manda_dado, enderec):
+def envia_voz(socket, manda_dado):
     while True:
         try:
             data = manda_dado.read(TAM_BUFFER)
-            socket.sendto(data, (enderec, PORT_AUDIO))
+            socket.sendall(data)
         except:
             pass
 
