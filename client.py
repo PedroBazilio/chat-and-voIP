@@ -14,14 +14,7 @@ def audio():
     audio_format = pyaudio.paInt16
     channels = 1
     rate = 20000
-    
-    # SERVER_BIND = (HOST, PORT_AUDIO)
-
-    
-    # socket.connect((HOST, PORT_AUDIO))
-    # socket_audio.bind((HOST, PORT_AUDIO))
-
-    print(socket_audio)
+ 
     AUDIO = pyaudio.PyAudio()
     recebe_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=TAM_BUFFER)
     envia_stream = AUDIO.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=TAM_BUFFER)
@@ -44,6 +37,7 @@ def recebe_voz(recebe_dado, socket):
         except:
             pass
 
+
 def envia_voz(socket, manda_dado):
     while True:
         try:
@@ -55,14 +49,11 @@ def envia_voz(socket, manda_dado):
         except:
             pass
 
+
 def aceitar_chamada(janela):
     socket_audio.connect((HOST, PORT_AUDIO))
     janela.destroy()
     audio()
-
-
-
-# def recusar_chamada():
 
 
 def controle_chamada():
@@ -73,6 +64,47 @@ def controle_chamada():
 
     botao_recursar = Button(janela_aceita, text="Recusar", command= lambda: recusar_chamada(janela_aceita))
     botao_recursar.pack()
+
+
+def envia_string(janela):
+    msg = "!@#$%" + mensagem2.get()
+    mensagem2.set("")
+    # janela.destroy()
+    socket_do_cliente.send(bytes(msg, "utf8"))
+
+
+def conectar_remetente():
+    print('conectei')
+    audio()
+
+
+def liga(event=None):
+    if(count == 0):
+        janela_ligacao = tkinter.Toplevel()
+        janela_ligacao.wm_title("Ligar")
+
+        nomePesquisa = Entry(janela_ligacao, textvariable=mensagem2) 
+        nomePesquisa.bind("<Return>", envia_string) 
+        nomePesquisa.pack(side=LEFT, expand=True)
+        
+        
+        botao_nome = Button(janela_ligacao, text="Ligar", command=lambda:envia_string(janela_ligacao))
+        botao_nome.pack()
+        socket_audio.bind(('', PORT_AUDIO))
+        Thread(target=conectar_remetente).start()
+        
+        
+
+    else:
+        janela_no_name = tkinter.Toplevel()
+        janela_no_name.geometry("200x20")
+        janela_no_name.wm_title()
+        text = Label(janela_no_name, text='Você não digitou seu nome ainda!!!')
+        text.pack()
+        # mensagem_no_name = 'Você não digitou seu nome ainda!!!'
+
+    # socket_do_cliente.send(bytes('!@#$%'))
+
 
 def fecha_tela(event=None):  #Fecha a tela pelo X, fazendo o mesmo processo de quando se escreve {sair}
     
@@ -108,12 +140,6 @@ def enviar_nome(janela):
     socket_do_cliente.send(bytes(msg, "utf8"))
 
 
-def envia_string(janela):
-    msg = "!@#$%" + mensagem2.get()
-    mensagem2.set("")
-    # janela.destroy()
-    socket_do_cliente.send(bytes(msg, "utf8"))
-    
 
 def func_pesquisa():
     janela_pesquisa = tkinter.Toplevel()
@@ -130,36 +156,6 @@ def sair():
     socket_do_cliente.close()
     tk.quit()
 
-def conectar_remetente():
-    print('conectei')
-    audio()
-
-def liga(event=None):
-    if(count == 0):
-        janela_ligacao = tkinter.Toplevel()
-        janela_ligacao.wm_title("Ligar")
-
-        nomePesquisa = Entry(janela_ligacao, textvariable=mensagem2) 
-        nomePesquisa.bind("<Return>", envia_string) 
-        nomePesquisa.pack(side=LEFT, expand=True)
-        
-        
-        botao_nome = Button(janela_ligacao, text="Ligar", command=lambda:envia_string(janela_ligacao))
-        botao_nome.pack()
-        socket_audio.bind(('', PORT_AUDIO))
-        Thread(target=conectar_remetente).start()
-        
-        
-
-    else:
-        janela_no_name = tkinter.Toplevel()
-        janela_no_name.geometry("200x20")
-        janela_no_name.wm_title()
-        text = Label(janela_no_name, text='Você não digitou seu nome ainda!!!')
-        text.pack()
-        # mensagem_no_name = 'Você não digitou seu nome ainda!!!'
-
-    # socket_do_cliente.send(bytes('!@#$%'))
 
 tk = Tk()
 tk.title("Chat")

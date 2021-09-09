@@ -90,7 +90,6 @@ def vrfName(varNome, cliente):  #Recebe o nome digitado pelo usuário e o socket
     
     print("O nome do usuário é ", varNome)      
     cliente.send(bytes(('Usuário %s cadastrado.' % varNome), "utf8"))
-    cliente.send(bytes(('Se desejar sair, digite {sair}.'), "utf8"))
     
     for sock in lista_usuarios:  #mostra para todos os usuários o nome da pessoa que entrou
         sock.send(bytes(varNome+" Entrou!" , "utf8"))
