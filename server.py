@@ -36,6 +36,8 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
                     break
             if(estaNaLista):
                 addr_dest.send(bytes("recebe_ligacao", "utf8"))
+                resp = addr_dest.recv(TAM_BUFFER).decode("utf8")
+                cliente.send(bytes(resp, "utf8"))
 
         elif mensagem.startswith(bytes("Pesquisa", "utf8")):
             mensagem = mensagem.decode('utf8')

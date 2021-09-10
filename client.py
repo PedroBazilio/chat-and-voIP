@@ -51,6 +51,7 @@ def envia_voz(socket, manda_dado):
 
 
 def aceitar_chamada(janela):
+    socket_do_cliente.send(bytes("SIM", "utf8"))
     socket_audio.connect((HOST, PORT_AUDIO))
     janela.destroy()
     audio()
@@ -69,7 +70,7 @@ def controle_chamada():
 def envia_string(janela):
     msg = "!@#$%" + mensagem2.get()
     mensagem2.set("")
-    # janela.destroy()
+    janela.destroy()
     socket_do_cliente.send(bytes(msg, "utf8"))
 
 
@@ -79,31 +80,26 @@ def conectar_remetente():
 
 
 def liga(event=None):
-    if(count == 0):
-        janela_ligacao = tkinter.Toplevel()
-        janela_ligacao.wm_title("Ligar")
+    janela_ligacao = tkinter.Toplevel()
+    janela_ligacao.wm_title("Ligar")
 
-        nomePesquisa = Entry(janela_ligacao, textvariable=mensagem2) 
-        nomePesquisa.bind("<Return>", envia_string) 
-        nomePesquisa.pack(side=LEFT, expand=True)
-        
-        
-        botao_nome = Button(janela_ligacao, text="Ligar", command=lambda:envia_string(janela_ligacao))
-        botao_nome.pack()
+    nomePesquisa = Entry(janela_ligacao, textvariable=mensagem2) 
+    nomePesquisa.bind("<Return>", envia_string) 
+    nomePesquisa.pack(side=LEFT, expand=True)
+    
+    
+    botao_nome = Button(janela_ligacao, text="Ligar", command=lambda:envia_string(janela_ligacao))
+    botao_nome.pack()
+    mensagem_confirmacao = socket_do_cliente.recv(TAM_BUFFER).decode("utf8")
+    if(mensagem_confirmacao == "SIM"):
         socket_audio.bind(('', PORT_AUDIO))
         Thread(target=conectar_remetente).start()
-        
-        
-
     else:
-        janela_no_name = tkinter.Toplevel()
-        janela_no_name.geometry("200x20")
-        janela_no_name.wm_title()
-        text = Label(janela_no_name, text='Você não digitou seu nome ainda!!!')
-        text.pack()
-        # mensagem_no_name = 'Você não digitou seu nome ainda!!!'
+        lista_de_mensagens.insert(END, "Chamada Recusada")
+        
+        
 
-    # socket_do_cliente.send(bytes('!@#$%'))
+
 
 
 def fecha_tela(event=None):  #Fecha a tela pelo X, fazendo o mesmo processo de quando se escreve {sair}
@@ -125,7 +121,6 @@ def recebe():    #Recebe a mensagem do server já tratada
     
 
 def enviar_msg(event=None):  #Enviar a mensagem para o server para ser tratada
-    count = 1
     msg = mensagem.get()
     mensagem.set("")
     socket_do_cliente.send(bytes(msg, "utf8"))
