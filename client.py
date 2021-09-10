@@ -43,7 +43,7 @@ def envia_voz(socket, manda_dado):
         try:
             
             data = manda_dado.read(TAM_BUFFER)
-            print(data)
+            #print(data)
             socket.send(data)
 
         except:
