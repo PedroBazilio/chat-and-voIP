@@ -27,7 +27,7 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
         
         search = decodeVar(mensagem) #Verificação se a palavra "Pesquisa" foi escrita
 
-        if mensagem.startswith(audio):
+        if mensagem.startswith(audio):  #Verifica se será feito uma ligação, comparando a mensagem com o controle
             nome = mensagem[5:]
             nome = nome.decode('utf8')
             for cli, addr_dest in zip(lista_usuarios, enderecos): #procura pelo nome
@@ -35,7 +35,7 @@ def tratamento_nome_e_mensagem(cliente):  #Recebe o socket do cliente para aceit
                     estaNaLista = True
                     break
             if(estaNaLista):
-                addr_dest.send(bytes("recebe_ligacao", "utf8"))
+                addr_dest.send(bytes("recebe_ligacao", "utf8")) #Envia a mensgagem de controle "recebe_ligacao" para ser identificado no cliente que é uma ligação
 
         elif mensagem.startswith(bytes("Pesquisa", "utf8")):
             mensagem = mensagem.decode('utf8')

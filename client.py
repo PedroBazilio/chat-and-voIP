@@ -9,7 +9,7 @@ import pyaudio
 
 count = 0
 
-def audio():
+def audio():    #Local onde serão tratadas as variáveis do áudio e é chamada a Thread para que seja contínuo
 
     audio_format = pyaudio.paInt16
     channels = 1
@@ -26,7 +26,7 @@ def audio():
     transmite_thread.start()
 
 
-def recebe_voz(recebe_dado, socket):
+def recebe_voz(recebe_dado, socket):   #Função para receber o áudio
    
     while True:
         try:
@@ -38,7 +38,7 @@ def recebe_voz(recebe_dado, socket):
             pass
 
 
-def envia_voz(socket, manda_dado):
+def envia_voz(socket, manda_dado):   #Função para realizar o envio de voz
     while True:
         try:
             
@@ -50,13 +50,18 @@ def envia_voz(socket, manda_dado):
             pass
 
 
-def aceitar_chamada(janela):
+def aceitar_chamada(janela):   #Conecta caso seja aceita a chamada
     socket_audio.connect((HOST, PORT_AUDIO))
     janela.destroy()
     audio()
 
+def recusar_chamada(janela):   #Recusa a chamada
+    janela.destroy()
+    socket_do_cliente.send(bytes("Chamada recusada", "utf8"))
 
-def controle_chamada():
+
+
+def controle_chamada():    #Função onde fica localizado os botões no popup para controle da chama
     janela_aceita = tkinter.Toplevel()
     janela_aceita.wm_title("Recebendo chamada")
     botao_aceitar = Button(janela_aceita, text="Aceitar", command=lambda: aceitar_chamada(janela_aceita))
@@ -66,14 +71,14 @@ def controle_chamada():
     botao_recursar.pack()
 
 
-def envia_string(janela):
+def envia_string(janela):      #Adiciona a string !@#$% na string do nome para realizar o controle no servidor
     msg = "!@#$%" + mensagem2.get()
     mensagem2.set("")
     # janela.destroy()
     socket_do_cliente.send(bytes(msg, "utf8"))
 
 
-def conectar_remetente():
+def conectar_remetente():  #Chama a função audio por parte do remetente, para realizar a ligação
     print('conectei')
     audio()
 
@@ -83,14 +88,14 @@ def liga(event=None):
         janela_ligacao = tkinter.Toplevel()
         janela_ligacao.wm_title("Ligar")
 
-        nomePesquisa = Entry(janela_ligacao, textvariable=mensagem2) 
+        nomePesquisa = Entry(janela_ligacao, textvariable=mensagem2)    #Variável que receberá o nome que participará da ligação
         nomePesquisa.bind("<Return>", envia_string) 
         nomePesquisa.pack(side=LEFT, expand=True)
         
         
-        botao_nome = Button(janela_ligacao, text="Ligar", command=lambda:envia_string(janela_ligacao))
+        botao_nome = Button(janela_ligacao, text="Ligar", command=lambda:envia_string(janela_ligacao))   #Chama a função envia_string para mandar o nome para o servidor
         botao_nome.pack()
-        socket_audio.bind(('', PORT_AUDIO))
+        socket_audio.bind(('', PORT_AUDIO))    #Ocorre um bind na porta 6000 por parte de um cliente
         Thread(target=conectar_remetente).start()
         
         
@@ -115,10 +120,10 @@ def recebe():    #Recebe a mensagem do server já tratada
     while True:
         try:
             msg = socket_do_cliente.recv(TAM_BUFFER).decode("utf8")
-            if(msg == "recebe_ligacao"):
+            if(msg == "recebe_ligacao"):   #Se possui a string "recebe_ligacao" na mensagem é chamada a controle_chamada para iniciar a ligação
                 resposta = controle_chamada()
             else:
-                lista_de_mensagens.insert(END, msg)
+                lista_de_mensagens.insert(END, msg)  #Adiciona a mensagem na tela de mensagens do usuário
         except OSError:
             break
 
@@ -133,7 +138,7 @@ def enviar_msg(event=None):  #Enviar a mensagem para o server para ser tratada
         socket_do_cliente.close()
         tk.quit()
 
-def enviar_nome(janela):
+def enviar_nome(janela):    #Envia o nome a ser pesquisa para o servidor, adicionando a palavra "Pesquisa"
     msg = "Pesquisa " + mensagem2.get()
     mensagem2.set("")
     janela.destroy()
@@ -141,8 +146,8 @@ def enviar_nome(janela):
 
 
 
-def func_pesquisa():
-    janela_pesquisa = tkinter.Toplevel()
+def func_pesquisa():   #Ao clicar no botão pesquisa será aberto essa função, abrindo um popup. E envia para o nome para a função enviar_nome
+    janela_pesquisa = tkinter.Toplevel()     
     janela_pesquisa.wm_title("Pesquisa") 
     entrada_nome = Entry(janela_pesquisa, textvariable=mensagem2)
 
@@ -152,9 +157,9 @@ def func_pesquisa():
     botao_nome.pack()
 
 def sair():
-    socket_do_cliente.send(bytes("{sair}", "utf8"))
-    socket_do_cliente.close()
-    tk.quit()
+    socket_do_cliente.send(bytes("{sair}", "utf8"))   #Manda para o servidor o comando {sair} para o cliente ser excluído da lista no servidor
+    socket_do_cliente.close()    #fecha o socket TCP
+    tk.quit()  #Fecha a janela do TKinter
 
 
 tk = Tk()
@@ -184,13 +189,13 @@ entrada.pack(side=LEFT, expand=True)   #Adiciona o local
 botao_mensagem = Button(tk, text="Enviar", command=enviar_msg)  #Funciona do mesmo jeito que apertar Enter para receber a string escrita
 botao_mensagem.pack(side=LEFT)     #Cria o botão na tela do lado esquerdo
 
-botao_pesquisa = Button(tk, text="Pesquisar", command=func_pesquisa)
+botao_pesquisa = Button(tk, text="Pesquisar", command=func_pesquisa)   #Botão para realizar pesquisa
 botao_pesquisa.pack(side=LEFT)    
 
-botao_chamada = Button(tk, text="Ligar", command=liga)
+botao_chamada = Button(tk, text="Ligar", command=liga)  #Botão para ligar
 botao_chamada.pack(side=LEFT)
 
-botao_chamada = Button(tk, text="Sair", command=sair)
+botao_chamada = Button(tk, text="Sair", command=sair)   #Botão para sair
 botao_chamada.pack(side=LEFT)
 
 
@@ -198,18 +203,17 @@ tk.protocol("WM_DELETE_WINDOW", fecha_tela)   #Para fechar a tela
 
 TAM_BUFFER = 1024   #Variáveis para socket
 HOST = socket.gethostbyname(socket.gethostname())
-PORT = 5000 
-PORT_AUDIO = 6000   
+PORT = 5000   #Porta para conexão entre sockets TCP
+PORT_AUDIO = 6000   #Porta para conexão entre sockets UDP
 ADDR = (HOST, PORT)
 
-socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Cria o socket com o protocolo UDP
 
 
 socket_do_cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #Cria o socket com o protocolo TCP por meio do socket.SOCK_STREAM
 
 
 socket_do_cliente.connect(ADDR)    #Conecta o socket do usuário na porta 5000
-print(socket_do_cliente)
 recebe_thread = Thread(target=recebe) 
 recebe_thread.start()
 mainloop()
